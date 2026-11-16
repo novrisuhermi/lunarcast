@@ -1,0 +1,57 @@
+url: https://novrisuhermi.github.io/lunarcast/
+
+template:
+  bootstrap: 5
+
+home:
+  title: "lunarcast: Calendar Variation Models for Moving Holidays"
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [search, github]
+
+reference:
+- title: Automatic calendar variation model
+  desc: The proposed two-level model with automatic specification.
+  contents:
+  - lunarcast
+  - forecast.lunarcast
+  - holiday_effects
+- title: Classical calendar variation model
+  desc: Holiday-month dummy with a constant effect (structures m1 to m6).
+  contents:
+  - calvar_classic
+  - calvar_classic_all
+  - forecast.calvar_classic
+- title: Holiday dates and regressors
+  contents:
+  - holiday_dates
+  - easter_dates
+  - holiday_window
+- title: Evaluation
+  contents:
+  - rolling_origin
+  - rolling_summary
+  - forecast_accuracy
+- title: Data
+  contents:
+  - sapi
+- title: Re-exported
+  contents:
+  - reexports
+
+articles:
+- title: Get started
+  navbar: ~
+  contents:
+  - lunarcast
+- title: Background
+  navbar: Background
+  contents:
+  - theory
+  - classic-vs-lunarcast
+- title: Bahasa Indonesia
+  navbar: Bahasa Indonesia
+  contents:
+  - panduan-indonesia

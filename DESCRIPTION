@@ -1,0 +1,29 @@
+Package: lunarcast
+Type: Package
+Title: Calendar Variation Models for Time Series with Moving Holidays
+Version: 0.1.0
+Authors@R: person("Novri", "Suhermi", email = "novri.suhermi@its.ac.id",
+    role = c("aut", "cre"))
+Description: Forecasts monthly and quarterly time series affected by moving
+    holidays whose Gregorian dates change every year, such as Eid al-Fitr,
+    Eid al-Adha, the Chinese New Year and Easter. Holiday effects enter
+    through window regressors, may differ between occurrences (a two-level
+    model in which the effect of the next occurrence is forecast from past
+    effects) and are combined with a regression with ARIMA errors whose
+    trend and seasonal structure is chosen by calendar-aware
+    cross-validation. The classical calendar variation model, with a dummy
+    for the holiday month and a constant effect, is included for
+    comparison, together with tools for rolling-origin evaluation.
+License: GPL (>= 3)
+URL: https://github.com/novrisuhermi/lunarcast,
+    https://novrisuhermi.github.io/lunarcast/
+BugReports: https://github.com/novrisuhermi/lunarcast/issues
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 4.1.0)
+Imports: forecast, graphics, stats, utils
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Config/Needs/website: pkgdown
+RoxygenNote: 7.3.1

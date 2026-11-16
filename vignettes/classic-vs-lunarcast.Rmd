@@ -1,0 +1,162 @@
+---
+title: "From the classical model to lunarcast"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{From the classical model to lunarcast}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 3.6)
+```
+
+This vignette reproduces the classical analysis of the `sapi` series (six
+calendar variation models fitted to 2004--2024 and tested on 2025), adds
+lunarcast to it, and then shows why a single test year is not enough to
+compare the two.
+
+```{r setup, message = FALSE}
+library(lunarcast)
+adha  <- holiday_dates("idul_adha")
+fitri <- holiday_dates("idul_fitri")
+train <- window(sapi, end = c(2024, 12))
+test  <- window(sapi, start = c(2025, 1))
+```
+
+## The six classical models
+
+Each model is a regression with ARIMA errors on the original scale with the
+Eid al-Adha month dummy $V_t$ and a constant effect $\alpha$:
+
+| Model | Trend | Seasonality |
+|:--|:--|:--|
+| m1 | deterministic ($\beta_0 + \beta_1 t$) | 11 monthly dummies |
+| m2 | deterministic | Fourier terms, $K = 5$ |
+| m3 | stochastic (differencing) | 11 monthly dummies |
+| m4 | stochastic | Fourier terms, $K = 5$ |
+| m5 | deterministic | seasonal ARIMA |
+| m6 | stochastic | seasonal ARIMA |
+
+```{r classic}
+classic <- calvar_classic_all(train, adha)
+classic
+```
+
+The column `effect` is the constant holiday effect $\alpha$ in index points.
+The estimates differ slightly from an analysis whose dummy omits the second
+Eid al-Adha of 2006 (31 December); `holiday_dates()` includes both.
+It is much smaller in m5 and m6 than in m1 to m4: with seasonal ARIMA errors,
+part of the holiday effect is carried by the seasonal autoregression instead
+of the dummy. With monthly dummies, part of it is absorbed by the dummy of
+the months in which the holiday often fell.
+
+## lunarcast on the same data
+
+```{r lunarcast}
+lc <- lunarcast(train, list(adha = adha, fitri = fitri))
+lc
+```
+
+## One test year: 2025
+
+```{r test}
+fc_classic <- forecast(classic, h = length(test))
+fc_lc      <- forecast(lc, h = length(test))
+acc <- do.call(forecast_accuracy,
+               c(list(actual = test), fc_classic, list(lunarcast = fc_lc)))
+acc[, -1] <- round(acc[, -1], 2)
+acc
+```
+
+```{r test-plot}
+plot(test, ylim = c(0, max(test, fc_lc$mean) * 1.15), lwd = 2, col = "grey40",
+     xlab = "", ylab = "Index", main = "2025: observed and forecasts")
+lines(fc_classic$m6$mean, col = "darkorange", lwd = 1.5)
+lines(fc_lc$mean, col = "royalblue", lwd = 1.5)
+legend("topright", c("observed", "classical m6", "lunarcast"), bty = "n",
+       col = c("grey40", "darkorange", "royalblue"), lwd = c(2, 1.5, 1.5))
+```
+
+In 2025 the classical m6 model is the most accurate. A single test year is,
+however, a fragile basis for comparison: in 2025 Eid al-Adha fell in June for
+the third year in a row, the ideal situation for a seasonal ARIMA model, which
+simply repeats last year's June. The difficult years are those in which the
+holiday moves to another month, and they do not occur every year.
+
+## Fourteen test years: rolling origin
+
+`rolling_origin()` refits every model at the end of each year from 2011 to
+2024 and forecasts the following year, so that 14 test years (2012 to 2025,
+167 months) are used. Running it for all models takes some time; the results
+for `sapi` are stored in the package:
+
+```{r rolling-read}
+r <- read.csv(system.file("extdata", "rolling_sapi.csv", package = "lunarcast"))
+r$model <- factor(r$model, levels = unique(r$model))
+rolling_summary(r)
+```
+
+The lunarcast rows differ only in how the trend and seasonal structure is
+chosen: by AICc (`lunarcast_aicc`), fixed without seasonality
+(`lunarcast_none`), by cross-validation with the smallest error
+(`lunarcast_cv_min`) or by cross-validation with the one-standard-error rule
+(`lunarcast`, the default). The code that produced the file is shown at the
+end of this vignette.
+
+```{r rolling-plot}
+yearly <- tapply((r$pred - r$actual)^2, list(r$year, r$model),
+                 function(v) sqrt(mean(v)))
+years <- as.numeric(rownames(yearly))
+plot(years, yearly[, "classic_m6"], type = "b", pch = 19, col = "darkorange",
+     ylim = c(0, max(yearly[, c("classic_m6", "lunarcast")]) * 1.1),
+     xlab = "", ylab = "RMSE", main = "RMSE per test year")
+lines(years, yearly[, "lunarcast"], type = "b", pch = 19, col = "royalblue")
+legend("topleft", c("classical m6", "lunarcast"), col = c("darkorange", "royalblue"),
+       pch = 19, bty = "n")
+```
+
+What the table shows:
+
+* The best classical model is m6 (stochastic trend and seasonality). The
+  models with seasonal dummies or Fourier terms (m1 to m4) are clearly worse,
+  because the dummies of the months in which the holiday used to fall keep
+  predicting peaks after the holiday has moved.
+* lunarcast lowers the overall RMSE from 7.95 to 5.00 and the RMSE in
+  holiday months from 20.25 to 8.06 (about 60%).
+* Choosing the structure by AICc picks seasonal ARIMA errors at most origins
+  and gives a clearly worse forecast than cross-validation: a good in-sample
+  fit is not the same as a good forecast.
+
+## How the rolling-origin results were produced
+
+```{r produce, eval = FALSE}
+hol  <- list(adha = adha, fitri = fitri)
+spec <- classic$spec
+classic_models <- lapply(seq_len(6), function(i) {
+  force(i)
+  function(y, h) forecast(calvar_classic(y, adha, spec$trend[i], spec$season[i]),
+                          h = h)$mean
+})
+names(classic_models) <- paste0("classic_", spec$model)
+
+# the lunarcast variants share the calendar selected at each origin
+lunarcast_variant <- function(...) {
+  function(y, h) {
+    base <- lunarcast(y, hol, select = "aicc")
+    fit  <- lunarcast(y, hol, window = base$window, effect = base$effect, ...)
+    forecast(fit, h = h)$mean
+  }
+}
+lunarcast_models <- list(
+  lunarcast_aicc   = function(y, h) forecast(lunarcast(y, hol, select = "aicc"), h = h)$mean,
+  lunarcast_none   = lunarcast_variant(season = "none", select = "aicc"),
+  lunarcast_cv_min = lunarcast_variant(cv_rule = "min"),
+  lunarcast        = lunarcast_variant()
+)
+r <- rolling_origin(sapi, adha, c(classic_models, lunarcast_models), first = 2012)
+rolling_summary(r)
+```
+
+The same code is in `data-raw/rolling_sapi.R` in the package repository.

@@ -1,0 +1,11 @@
+^lunarcast\.Rproj$
+^\.Rproj\.user$
+^data-raw$
+^README\.Rmd$
+^LICENSE\.md$
+^\.github$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^CODE_OF_CONDUCT\.md$
+^cran-comments\.md$

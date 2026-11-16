@@ -1,0 +1,145 @@
+---
+title: "Panduan lunarcast (Bahasa Indonesia)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Panduan lunarcast (Bahasa Indonesia)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 3.6)
+```
+
+Panduan ini merangkum ide dan cara pakai lunarcast dalam bahasa Indonesia.
+Penjelasan lengkap ada di `vignette("theory")` dan contoh lengkap di
+`vignette("lunarcast")`.
+
+## Masalahnya: hari raya yang bergeser
+
+Tahun Hijriah sekitar 354 hari, sedangkan tahun Masehi sekitar 365 hari.
+Akibatnya Idul Fitri dan Idul Adha maju sekitar **11 hari setiap tahun**, dan
+pada data bulanan efeknya pindah ke bulan sebelumnya kira-kira setiap
+**2,8 tahun**. Imlek dan Paskah juga bergeser, meski dalam rentang sekitar
+satu bulan.
+
+## Model variasi kalender klasik
+
+Model yang umum dipakai adalah regresi dengan galat ARIMA dan dummy bulan
+hari raya:
+
+$$
+Y_t = \beta_0 + \beta_1 t + S_t + \alpha V_t + N_t,
+\qquad V_t = 1 \text{ jika bulan } t \text{ memuat hari raya.}
+$$
+
+Model ini berasumsi bahwa (1) hari raya hanya memengaruhi bulan yang
+memuatnya, (2) efeknya sama setiap tahun, dan (3) efeknya aditif. Ketiganya
+tidak berlaku pada data pencarian "sapi": Idul Adha 31 Juli 2020 justru
+memuncak di Agustus, efeknya hampir nol pada 2004 lalu lebih dari tiga kali
+lipat sekitar 2015--2019, dan sisa efek yang tidak tertangkap dummy bocor ke
+komponen musiman sehingga muncul "puncak hantu" di bulan lama setelah hari
+raya pindah bulan.
+
+## Yang dilakukan lunarcast
+
+1. **Regresor jendela.** Dummy diganti dengan porsi hari dalam jendela
+   $[D_{hj} + a_h,\ D_{hj} + b_h]$ di sekitar hari raya yang jatuh di setiap
+   bulan:
+   $$w_{hj,t} = \frac{|W_{hj} \cap P_t|}{|W_{hj}|}.$$
+   Jendela $(a_h, b_h)$ dipilih otomatis. Jendela $(0, 0)$ sama dengan dummy
+   klasik.
+2. **Efek multiplikatif.** Pada skala log, hari raya mengalikan level dengan
+   $e^{\alpha}$, bukan menambah angka tetap.
+3. **Efek dua level.** Setiap kejadian punya efek sendiri $\alpha_{hj}$
+   (level 1), dan efek kejadian berikutnya diramal dari deret efek
+   sebelumnya (level 2):
+   $$\hat\alpha_{h,J+1} = g(\hat\alpha_{h1}, \ldots, \hat\alpha_{hJ}),$$
+   dengan $g$ dipilih dari rata-rata, rata-rata tertimbang, *random walk*,
+   SES, atau damped Holt lewat validasi silang.
+4. **Struktur tren dan musiman via validasi silang.** Enam struktur model
+   klasik (tren deterministik/stokastik × musiman dummy/Fourier/stokastik),
+   ditambah opsi tanpa musiman, dibandingkan lewat ramalan satu tahun ke
+   depan dari beberapa titik asal. Aturan satu galat baku memilih struktur
+   paling sederhana yang galatnya masih dalam satu galat baku dari yang
+   terbaik.
+5. **Outlier (opsional).** AO, LS, dan TC dideteksi di luar periode hari raya.
+
+Model klasik adalah kasus khusus lunarcast: skala asli, jendela $(0, 0)$,
+efek konstan, satu hari raya, dan struktur yang ditetapkan.
+
+## Instalasi
+
+```r
+install.packages("pak")
+pak::pak("novrisuhermi/lunarcast")
+```
+
+## Contoh pemakaian
+
+```{r setup, message = FALSE}
+library(lunarcast)
+hol <- list(adha  = holiday_dates("idul_adha"),
+            fitri = holiday_dates("idul_fitri"))
+```
+
+Spesifikasi otomatis penuh cukup dengan `lunarcast(sapi, hol)` (sekitar satu
+menit). Agar contoh ini cepat, jendela, tipe efek, dan struktur ditetapkan
+sesuai hasil pemilihan otomatis pada data `sapi`:
+
+```{r}
+fit <- lunarcast(sapi, hol,
+                 window = list(adha = c(-3, 7), fitri = c(-28, 3)),
+                 effect = list(adha = "two-level", fitri = "constant"),
+                 trend = "stochastic", season = "none")
+fit
+```
+
+Kolom `ratio` adalah efek multiplikatif setiap Idul Adha. Grafik efek per
+kejadian beserta ramalan untuk kejadian berikutnya:
+
+```{r}
+plot(fit)
+```
+
+Ramalan 13 bulan ke depan, termasuk Idul Adha 27 Mei 2026:
+
+```{r}
+fc <- forecast(fit, h = 13)
+plot(fc, include = 60)
+round(cbind(ramalan = fc$mean, bawah = fc$lower[, 1], atas = fc$upper[, 1]), 1)
+```
+
+Skenario: bagaimana jika Idul Adha berikutnya menggandakan level?
+
+```{r}
+sc <- forecast(fit, h = 13, level2 = list(adha = log(2)))
+round(cbind(model = fc$mean, skenario = sc$mean)[5:7, ], 1)
+```
+
+## Model klasik dan perbandingan
+
+```{r}
+m6 <- calvar_classic(sapi, hol$adha, trend = "stochastic", season = "stochastic")
+m6
+```
+
+Keenam model klasik (m1 sampai m6) dapat diestimasi sekaligus dengan
+`calvar_classic_all()`. Pada evaluasi *rolling origin* 14 tahun (2012--2025),
+model klasik terbaik (m6) memiliki RMSE 7,95, sedangkan lunarcast 5,00; di
+bulan hari raya, RMSE turun dari 20,25 menjadi 8,06. Rinciannya ada di
+`vignette("classic-vs-lunarcast")`.
+
+## Fungsi utama
+
+| Fungsi | Kegunaan |
+|:--|:--|
+| `lunarcast()` | model variasi kalender dua level otomatis |
+| `forecast()` | ramalan dan skenario |
+| `holiday_effects()` | tabel efek per kejadian |
+| `calvar_classic()`, `calvar_classic_all()` | model variasi kalender klasik m1--m6 |
+| `holiday_dates()`, `easter_dates()` | tanggal hari raya |
+| `holiday_window()` | regresor jendela |
+| `rolling_origin()`, `rolling_summary()` | evaluasi *rolling origin* |
+| `forecast_accuracy()` | RMSE, MAE, MAPE, sMAPE |
