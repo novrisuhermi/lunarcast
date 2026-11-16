@@ -2,7 +2,7 @@ url: https://novrisuhermi.github.io/lunarcast/
 
 template:
   bootstrap: 5
-  math-rendering: mathjax
+  math-rendering: katex
 
 home:
   title: "lunarcast: Calendar Variation Models for Moving Holidays"
