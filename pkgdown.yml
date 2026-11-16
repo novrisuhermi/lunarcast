@@ -1,0 +1,13 @@
+pandoc: 3.1.3
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  classic-vs-lunarcast: classic-vs-lunarcast.html
+  lunarcast: lunarcast.html
+  panduan-indonesia: panduan-indonesia.html
+  theory: theory.html
+last_built: 2026-11-16T22:49Z
+urls:
+  reference: https://novrisuhermi.github.io/lunarcast/reference
+  article: https://novrisuhermi.github.io/lunarcast/articles
+
