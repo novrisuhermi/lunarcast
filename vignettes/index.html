@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lunarcast vignettes</title>
+<link rel="icon" href="../favicon.ico">
+<style>
+  :root { --text: #222; --muted: #666; --link: #0b5cad; --rule: #ddd; --bg: #fff; --head: #f4f4f4; }
+  @media (prefers-color-scheme: dark) {
+    :root { --text: #e6e6e6; --muted: #aaa; --link: #7fb3ff; --rule: #444; --bg: #1b1b1b; --head: #262626; }
+  }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; color: var(--text); background: var(--bg);
+         max-width: 820px; margin: 2em auto; padding: 0 1em; line-height: 1.5; }
+  h1 { font-size: 1.6em; margin-bottom: .2em; }
+  h2 { font-size: 1.2em; margin-top: 1.8em; border-bottom: 1px solid var(--rule); padding-bottom: .2em; }
+  a { color: var(--link); }
+  .sub { color: var(--muted); margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: .45em .6em; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { background: var(--head); }
+  td.links { white-space: nowrap; }
+  img.logo { float: right; height: 110px; margin-left: 1em; }
+  code { font-size: .95em; }
+</style>
+<link rel="stylesheet" href="../katex/katex.min.css"><style>.katex-display{overflow-x:auto;overflow-y:hidden;padding:.3em 0}.katex{font-size:1.1em}</style>
+</head>
+<body>
+<img class="logo" src="../logo.png" alt="lunarcast logo">
+<h1>lunarcast</h1>
+<p class="sub">Calendar Variation Models for Time Series with Moving Holidays</p>
+<p>The vignettes of the package, rendered with all code run and all output and
+figures shown, as they appear on CRAN. Each page is a single self-contained
+file.</p>
+
+<h2>Vignettes</h2>
+<table>
+<thead><tr><th>Vignette</th><th>Read</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td><b>Get started with lunarcast</b><br>A complete analysis step by step: holiday dates, window regressors, the automatic model, holiday effects, forecasts and scenarios.</td>
+<td class="links"><a href="lunarcast.html">HTML</a></td>
+<td class="links"><a href="lunarcast.R">R code</a> · <a href="lunarcast.Rmd">Rmd</a></td></tr>
+<tr><td><b>How lunarcast works</b><br>The theory: why moving holidays are hard, the classical model and its assumptions, window regressors, two-level effects and model selection.</td>
+<td class="links"><a href="theory.html">HTML</a></td>
+<td class="links"><a href="theory.R">R code</a> · <a href="theory.Rmd">Rmd</a></td></tr>
+<tr><td><b>From the classical model to lunarcast</b><br>The six classical models m1 to m6, a test on 2025 and a 14-year rolling-origin evaluation.</td>
+<td class="links"><a href="classic-vs-lunarcast.html">HTML</a></td>
+<td class="links"><a href="classic-vs-lunarcast.R">R code</a> · <a href="classic-vs-lunarcast.Rmd">Rmd</a></td></tr>
+<tr><td><b>Panduan lunarcast (Bahasa Indonesia)</b><br>Ringkasan teori dan contoh pemakaian dalam Bahasa Indonesia.</td>
+<td class="links"><a href="panduan-indonesia.html">HTML</a></td>
+<td class="links"><a href="panduan-indonesia.R">R code</a> · <a href="panduan-indonesia.Rmd">Rmd</a></td></tr>
+</tbody>
+</table>
+
+<h2>Links</h2>
+<ul>
+<li>Package website: <a href="../">novrisuhermi.github.io/lunarcast</a></li>
+<li>Source code and issues: <a href="https://github.com/novrisuhermi/lunarcast">github.com/novrisuhermi/lunarcast</a></li>
+<li>Install: <code>pak::pak("novrisuhermi/lunarcast")</code></li>
+</ul>
+</body>
+</html>

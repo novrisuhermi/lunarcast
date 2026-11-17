@@ -124,7 +124,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu">pak</span><span class="op">(</span><span class="st">"novrisuhermi/lunarcast"</span><span class="op">)</span></span></code></pre></div>
-<p>To also build the vignettes (tutorial, theory, comparison and an Indonesian guide):</p>
+<p><code>pak::pak()</code> does not build the vignettes; read them online at <a href="https://novrisuhermi.github.io/lunarcast/vignettes/" class="uri">https://novrisuhermi.github.io/lunarcast/vignettes/</a> or install with:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/remotes/man/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"novrisuhermi/lunarcast"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -319,18 +319,18 @@ w_{hj,t} = \frac{|[D_{hj} + a_h,\ D_{hj} + b_h] \cap P_t|}{b_h - a_h + 1},</anno
 <div class="section level2">
 <h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
 </h2>
+<p>The vignettes are available already run and rendered, as on CRAN, at <a href="https://novrisuhermi.github.io/lunarcast/vignettes/" class="uri">https://novrisuhermi.github.io/lunarcast/vignettes/</a>:</p>
 <ul>
 <li>
-<code><a href="articles/lunarcast.html">vignette("lunarcast")</a></code>: get started, a complete analysis step by step.</li>
+<a href="https://novrisuhermi.github.io/lunarcast/vignettes/lunarcast.html">Get started with lunarcast</a>: a complete analysis step by step.</li>
 <li>
-<code><a href="articles/theory.html">vignette("theory")</a></code>: how lunarcast works.</li>
+<a href="https://novrisuhermi.github.io/lunarcast/vignettes/theory.html">How lunarcast works</a>: the theory, with equations.</li>
 <li>
-<code><a href="articles/classic-vs-lunarcast.html">vignette("classic-vs-lunarcast")</a></code>: the classical model and the evaluation.</li>
+<a href="https://novrisuhermi.github.io/lunarcast/vignettes/classic-vs-lunarcast.html">From the classical model to lunarcast</a>: the classical models m1 to m6 and the evaluation.</li>
 <li>
-<code><a href="articles/panduan-indonesia.html">vignette("panduan-indonesia")</a></code>: panduan dalam Bahasa Indonesia.</li>
-<li>Website: <a href="https://novrisuhermi.github.io/lunarcast/" class="uri">https://novrisuhermi.github.io/lunarcast/</a>
-</li>
+<a href="https://novrisuhermi.github.io/lunarcast/vignettes/panduan-indonesia.html">Panduan lunarcast (Bahasa Indonesia)</a>: panduan dalam Bahasa Indonesia.</li>
 </ul>
+<p>The package website, <a href="https://novrisuhermi.github.io/lunarcast/" class="uri">https://novrisuhermi.github.io/lunarcast/</a>, has the same articles and the reference of every function.</p>
 </div>
 <div class="section level2">
 <h2 id="ringkasan-bahasa-indonesia">Ringkasan (Bahasa Indonesia)<a class="anchor" aria-label="anchor" href="#ringkasan-bahasa-indonesia"></a>

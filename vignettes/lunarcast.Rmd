@@ -1,0 +1,199 @@
+---
+title: "Get started with lunarcast"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get started with lunarcast}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>",
+                      fig.width = 7, fig.height = 3.6)
+```
+
+lunarcast forecasts monthly and quarterly series that react to **moving
+holidays**: holidays such as Eid al-Fitr, Eid al-Adha, the Chinese New Year
+or Easter, whose Gregorian date changes every year. This vignette walks
+through a complete analysis. The method is explained in
+`vignette("theory")` and compared with the classical calendar variation model
+in `vignette("classic-vs-lunarcast")`.
+
+## Installation
+
+```r
+# install.packages("pak")
+pak::pak("novrisuhermi/lunarcast")
+
+# or, with vignettes
+# install.packages("remotes")
+remotes::install_github("novrisuhermi/lunarcast", build_vignettes = TRUE)
+```
+
+## The data
+
+The package contains `sapi`, the monthly Google Trends index for "sapi"
+(cattle) in Indonesia. Interest peaks before Eid al-Adha, when cattle are
+bought for the sacrifice.
+
+```{r data, message = FALSE}
+library(lunarcast)
+plot(sapi, xlab = "", ylab = "Google Trends index",
+     main = "Search interest in \"sapi\"")
+```
+
+Two features make this series hard: the peaks move to an earlier month every
+few years, and their size changes, from almost nothing in 2004 to more than
+three times the usual level in the late 2010s.
+
+## Step 1: holiday dates
+
+```{r dates}
+adha <- holiday_dates("idul_adha")
+tail(adha, 4)
+```
+
+`holiday_dates()` gives the Indonesian dates of Eid al-Adha, Eid al-Fitr and
+the Chinese New Year from 2004 to 2027, and `easter_dates()` computes Easter
+and the holidays that follow from it. Any other holiday is simply a vector
+of dates.
+
+```{r other-dates}
+easter_dates(2025:2026, offset = -2)   # Good Friday
+my_holiday <- as.Date(c("2024-03-11", "2025-03-29", "2026-03-19"))
+```
+
+## Step 2: from dates to regressors
+
+A holiday influences the days around it, not a calendar month.
+`holiday_window()` computes the share of a window of days around each
+occurrence that falls in each month.
+
+```{r window}
+w <- holiday_window(adha, window = c(-3, 7), y = sapi)
+window(w, start = c(2020, 6), end = c(2020, 9))
+```
+
+Eid al-Adha fell on 31 July 2020. The window from three days before to seven
+days after puts 36% of the holiday in July and 64% in August, where the
+searches indeed peaked. A monthly dummy would have put everything in July.
+You do not need to build these regressors yourself; `lunarcast()` does it and
+chooses the window.
+
+## Step 3: fit the automatic model
+
+```{r fit}
+hol <- list(adha  = holiday_dates("idul_adha"),
+            fitri = holiday_dates("idul_fitri"))
+fit <- lunarcast(sapi, hol)
+fit
+```
+
+How to read the output:
+
+* The first line is the fitted regression with ARIMA errors and its AICc.
+* `Structure` is the selected trend and seasonal structure. The trend type
+  comes from KPSS tests; the table below it lists the candidate seasonal
+  structures with their cross-validated RMSE and its standard error. The
+  default one-SE rule takes the simplest structure within one standard error
+  of the best.
+* For each holiday you see whether its effect is `constant` or `two-level`,
+  the selected window in days around the holiday and, for two-level effects,
+  the level-2 rule used to forecast the next effect.
+* `ratio` is the multiplicative effect $e^{\alpha}$: 2.5 means that the
+  holiday (when its whole window falls in one month) multiplies the level of
+  that month by 2.5.
+
+## Step 4: inspect the holiday effects
+
+```{r effects}
+eff <- holiday_effects(fit)
+head(eff, 4)
+plot(fit)
+```
+
+Each point is the effect of one Eid al-Adha with its 95% confidence interval;
+the open circle is the forecast for the next occurrence. The effect grew until
+the late 2010s and has declined since, which a single constant effect cannot
+represent.
+
+## Step 5: forecast
+
+```{r forecast}
+fc <- forecast(fit, h = 13)
+plot(fc, include = 60)
+fc$future_effects
+round(cbind(forecast = fc$mean, lower = fc$lower[, 1],
+            upper = fc$upper[, 1]), 1)
+```
+
+The forecast is the median on the original scale with a 95% interval that
+includes the uncertainty about the next holiday effect.
+`fc$future_effects` shows the effect used for each new occurrence and the rule
+that produced it.
+
+### Scenarios
+
+To ask "what if the next Eid al-Adha doubles the level?", fix its effect:
+
+```{r scenario}
+sc <- forecast(fit, h = 13, level2 = list(adha = log(2)))
+round(cbind(model = fc$mean, scenario = sc$mean)[5:7, ], 1)
+```
+
+## Taking control of the automatic choices
+
+Every automatic choice can be fixed, which also makes fitting much faster.
+
+| Argument | What it controls | Example |
+|:--|:--|:--|
+| `window` | days around each holiday | `window = list(adha = c(-3, 7), fitri = c(-28, 3))` |
+| `effect` | constant or two-level effect | `effect = list(adha = "two-level", fitri = "constant")` |
+| `trend`, `season` | trend and seasonal structure | `trend = "stochastic", season = "none"`; `trend = "cv"` compares both trend types |
+| `select` | how the structure is chosen | `select = "aicc"` |
+| `cv_rule`, `cv_years` | cross-validation rule and origins | `cv_rule = "min", cv_years = 3` |
+| `level2` | rule for future effects | `level2 = list(adha = "rw")` |
+| `outliers` | detect AO, LS and TC outliers | `outliers = TRUE` |
+| `lambda` | transformation (`0` = log) | `lambda = NULL` for additive effects |
+
+```{r fixed}
+fast <- lunarcast(sapi, hol,
+                  window = list(adha = c(-3, 7), fitri = c(-28, 3)),
+                  effect = list(adha = "two-level", fitri = "constant"),
+                  trend = "stochastic", season = "none")
+fast
+```
+
+## The classical model
+
+The classical calendar variation model, with a dummy for the holiday month
+and the same effect every year, is available in the six structures m1 to m6:
+
+```{r classic}
+m6 <- calvar_classic(sapi, adha, trend = "stochastic", season = "stochastic")
+m6
+```
+
+`calvar_classic_all()` fits all six at once, and `forecast()` works for both
+kinds of models. The two approaches are compared in
+`vignette("classic-vs-lunarcast")`.
+
+## Evaluating forecasts
+
+`rolling_origin()` refits models at the end of every year and forecasts the
+next year; `rolling_summary()` reports the RMSE overall, in holiday months, in
+years in which the holiday moved to another month, and the median of the
+yearly RMSEs.
+
+```{r rolling, eval = FALSE}
+models <- list(
+  classic_m6 = function(y, h)
+    forecast(calvar_classic(y, adha, "stochastic", "stochastic"), h = h)$mean,
+  lunarcast  = function(y, h) forecast(lunarcast(y, hol), h = h)$mean
+)
+r <- rolling_origin(sapi, adha, models, first = 2012)
+rolling_summary(r)
+```
+
+`forecast_accuracy()` gives RMSE, MAE, MAPE and sMAPE for a single test
+period.
