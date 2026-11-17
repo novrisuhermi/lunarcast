@@ -1,3 +1,19 @@
+# lunarcast 0.1.1
+
+* The trend type now follows KPSS tests by default (`trend = "auto"`): a
+  stochastic trend is always a candidate and a deterministic linear trend only
+  when the tests indicate trend stationarity. This avoids extrapolating a
+  straight line when the slope of a series has changed. `trend = "cv"`
+  compares both trend types by cross-validation, as in 0.1.0.
+* Every ARIMA model, including those refitted during cross-validation, must
+  be stationary and invertible; a fit that is not is re-estimated by maximum
+  likelihood. Fitting no longer produces "NaNs produced" or "MA part of model
+  is not invertible" warnings.
+* The precision-weighted level-2 rule (`wmean`) ignores occurrences without
+  a standard error.
+* Rolling-origin results for `sapi` updated: RMSE 4.94 (was 5.00); the 2025
+  forecast error drops from 4.40 to 1.83.
+
 # lunarcast 0.1.0
 
 First release.

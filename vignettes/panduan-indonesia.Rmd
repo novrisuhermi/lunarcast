@@ -58,12 +58,13 @@ raya pindah bulan.
    $$\hat\alpha_{h,J+1} = g(\hat\alpha_{h1}, \ldots, \hat\alpha_{hJ}),$$
    dengan $g$ dipilih dari rata-rata, rata-rata tertimbang, *random walk*,
    SES, atau damped Holt lewat validasi silang.
-4. **Struktur tren dan musiman via validasi silang.** Enam struktur model
-   klasik (tren deterministik/stokastik × musiman dummy/Fourier/stokastik),
-   ditambah opsi tanpa musiman, dibandingkan lewat ramalan satu tahun ke
-   depan dari beberapa titik asal. Aturan satu galat baku memilih struktur
-   paling sederhana yang galatnya masih dalam satu galat baku dari yang
-   terbaik.
+4. **Struktur tren dan musiman.** Jenis tren ditentukan uji KPSS: tren
+   stokastik selalu menjadi kandidat, sedangkan tren deterministik hanya bila
+   uji menunjukkan deret stasioner di sekitar tren. Musiman (tanpa musiman,
+   Fourier, dummy, atau SARMA) dipilih lewat ramalan satu tahun ke depan dari
+   beberapa titik asal (validasi silang). Aturan satu galat baku memilih
+   struktur paling sederhana yang galatnya masih dalam satu galat baku dari
+   yang terbaik.
 5. **Outlier (opsional).** AO, LS, dan TC dideteksi di luar periode hari raya.
 
 Model klasik adalah kasus khusus lunarcast: skala asli, jendela $(0, 0)$,
@@ -127,8 +128,8 @@ m6
 
 Keenam model klasik (m1 sampai m6) dapat diestimasi sekaligus dengan
 `calvar_classic_all()`. Pada evaluasi *rolling origin* 14 tahun (2012--2025),
-model klasik terbaik (m6) memiliki RMSE 7,95, sedangkan lunarcast 5,00; di
-bulan hari raya, RMSE turun dari 20,25 menjadi 8,06. Rinciannya ada di
+model klasik terbaik (m6) memiliki RMSE 7,95, sedangkan lunarcast 4,94; di
+bulan hari raya, RMSE turun dari 20,25 menjadi 8,30. Rinciannya ada di
 `vignette("classic-vs-lunarcast")`.
 
 ## Fungsi utama

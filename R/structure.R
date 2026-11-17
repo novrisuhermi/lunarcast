@@ -164,8 +164,9 @@
         sp$outliers <- sp$outliers[sp$outliers$t < T, , drop = FALSE]
       sp$st <- cands[[i]]
       sp$method <- "CSS"
-      p <- tryCatch(as.numeric(forecast(do.call(.fit_spec, sp), h = h)$mean),
-                    error = function(e) rep(NA_real_, h))
+      p <- tryCatch(suppressWarnings(
+             as.numeric(forecast(do.call(.fit_spec, sp), h = h)$mean)),
+           error = function(e) rep(NA_real_, h))
       p - y[T + seq_len(h)]
     })
     e <- unlist(E)

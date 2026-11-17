@@ -23,10 +23,9 @@ lunarcast_variant <- function(...) {
   }
 }
 lunarcast_models <- list(
-  lunarcast_aicc   = function(y, h) forecast(lunarcast(y, hol, select = "aicc"), h = h)$mean,
-  lunarcast_none   = lunarcast_variant(season = "none", select = "aicc"),
-  lunarcast_cv_min = lunarcast_variant(cv_rule = "min"),
-  lunarcast        = lunarcast_variant()
+  lunarcast_aicc = function(y, h) forecast(lunarcast(y, hol, select = "aicc"), h = h)$mean,
+  lunarcast_none = lunarcast_variant(season = "none", select = "aicc"),
+  lunarcast      = lunarcast_variant()
 )
 
 r <- rolling_origin(sapi, adha, c(classic_models, lunarcast_models), first = 2012)

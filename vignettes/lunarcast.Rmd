@@ -92,10 +92,11 @@ fit
 How to read the output:
 
 * The first line is the fitted regression with ARIMA errors and its AICc.
-* `Structure` is the trend and seasonal structure chosen by
-  cross-validation; `CV-RMSE (SE)` lists all candidates with their
-  cross-validated error and its standard error. The default one-SE rule takes
-  the simplest structure within one standard error of the best.
+* `Structure` is the selected trend and seasonal structure. The trend type
+  comes from KPSS tests; the table below it lists the candidate seasonal
+  structures with their cross-validated RMSE and its standard error. The
+  default one-SE rule takes the simplest structure within one standard error
+  of the best.
 * For each holiday you see whether its effect is `constant` or `two-level`,
   the selected window in days around the holiday and, for two-level effects,
   the level-2 rule used to forecast the next effect.
@@ -148,7 +149,7 @@ Every automatic choice can be fixed, which also makes fitting much faster.
 |:--|:--|:--|
 | `window` | days around each holiday | `window = list(adha = c(-3, 7), fitri = c(-28, 3))` |
 | `effect` | constant or two-level effect | `effect = list(adha = "two-level", fitri = "constant")` |
-| `trend`, `season` | trend and seasonal structure | `trend = "stochastic", season = "none"` |
+| `trend`, `season` | trend and seasonal structure | `trend = "stochastic", season = "none"`; `trend = "cv"` compares both trend types |
 | `select` | how the structure is chosen | `select = "aicc"` |
 | `cv_rule`, `cv_years` | cross-validation rule and origins | `cv_rule = "min", cv_years = 3` |
 | `level2` | rule for future effects | `level2 = list(adha = "rw")` |

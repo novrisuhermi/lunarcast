@@ -28,11 +28,12 @@ every year. lunarcast relaxes each of its assumptions:
 - **Two-level effects.** Every occurrence of a holiday gets its own
   effect (level 1), and the effect of the next occurrence is forecast
   from the sequence of past effects (level 2), with its uncertainty.
-- **Calendar-aware selection.** The trend and seasonal structure (the
-  six structures of the classical approach, plus no seasonality) is
-  chosen by cross-validated forecasts with a one-standard-error rule,
-  after the calendar part has been specified, so that the seasonal part
-  cannot absorb the holiday effect.
+- **Calendar-aware selection.** After the calendar part has been
+  specified, so that the seasonal part cannot absorb the holiday effect,
+  the trend type is chosen by KPSS tests and the seasonality (none,
+  Fourier terms, dummies or seasonal ARIMA, the building blocks of the
+  six classical structures) by cross-validated forecasts with a
+  one-standard-error rule.
 
 The classical model is included too (`calvar_classic()`), as a benchmark
 and as a special case of lunarcast.
@@ -76,15 +77,11 @@ fit
 #> lunarcast: Regression with ARIMA(5,1,1)(2,0,0)[12] errors | AICc = -296.9 
 #> Structure (cv, 1se): stochastic + SARMA(2,0,0), d = 1
 #> Cross-validated RMSE of the candidate structures:
-#>                     structure RMSE    SE
-#>     stochastic + SARMA(2,0,0) 4.53 1.017
-#>     stochastic + fourier(K=4) 5.08 0.821
-#>            stochastic + dummy 5.10 0.795
-#>  deterministic + SARMA(2,0,0) 5.52 0.781
-#>             stochastic + none 5.86 0.962
-#>          deterministic + none 7.72 1.446
-#>         deterministic + dummy 8.24 1.570
-#>  deterministic + fourier(K=4) 8.31 1.684
+#>                  structure RMSE    SE
+#>  stochastic + SARMA(2,0,0) 4.53 1.017
+#>  stochastic + fourier(K=4) 5.08 0.821
+#>         stochastic + dummy 5.10 0.795
+#>          stochastic + none 5.86 0.962
 #> 
 #> adha: two-level effect, window [-3, +7] days, level 2 = wmean (CV-RMSE 0.13)
 #>       event   alpha     se ratio
@@ -205,7 +202,7 @@ Fourteen test years (2012 to 2025) of rolling-origin forecasts of `sapi`
 | Classical m1 (deterministic trend, dummies)                     |    10.42 |                  27.12 |
 | Classical m6 (stochastic trend and seasonality), best classical |     7.95 |                  20.25 |
 | lunarcast, structure chosen by AICc                             |     5.73 |                  12.28 |
-| **lunarcast (default)**                                         | **5.00** |               **8.06** |
+| **lunarcast (default)**                                         | **4.94** |               **8.30** |
 
 These results come from a single series; they show what the method can
 do, not a general ranking.
@@ -253,7 +250,7 @@ berbahasa Indonesia: `vignette("panduan-indonesia")`.
 ## Citation
 
     Suhermi N (2026). _lunarcast: Calendar Variation Models for Time Series
-    with Moving Holidays_. R package version 0.1.0,
+    with Moving Holidays_. R package version 0.1.1,
     <https://github.com/novrisuhermi/lunarcast>.
 
 ## Code of Conduct

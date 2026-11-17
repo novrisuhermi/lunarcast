@@ -14,7 +14,7 @@ lunarcast(
   k = 3,
   lambda = 0,
   share = c("level", "linear"),
-  trend = c("auto", "none", "deterministic", "stochastic"),
+  trend = c("auto", "cv", "none", "deterministic", "stochastic"),
   season = c("auto", "none", "dummy", "fourier", "stochastic"),
   select = c("cv", "aicc"),
   cv_years = 5,
@@ -49,13 +49,17 @@ lunarcast(
 \item{share}{`"level"` maps window shares to the log scale (only for
 `lambda = 0`); `"linear"` uses them as they are.}
 
-\item{trend}{`"auto"`, `"none"`, `"deterministic"` or `"stochastic"`.}
+\item{trend}{`"auto"` (default): KPSS tests decide whether the series is
+trend-stationary; a deterministic trend is a candidate only if they do,
+a stochastic trend (differencing) always. `"cv"` compares deterministic
+and stochastic trends by cross-validation. `"none"`, `"deterministic"`
+or `"stochastic"` fix the trend.}
 
 \item{season}{`"auto"`, `"none"`, `"dummy"`, `"fourier"` or `"stochastic"`.}
 
-\item{select}{`"cv"` compares the candidate structures (deterministic and
-stochastic trend, each with no, Fourier, dummy or stochastic seasonality)
-by one-year-ahead forecasts from `cv_years` origins one year apart at the
+\item{select}{`"cv"` compares the candidate structures (the trends allowed
+by `trend`, each with no, Fourier, dummy or stochastic seasonality) by
+one-year-ahead forecasts from `cv_years` origins one year apart at the
 end of the sample; `"aicc"` chooses the trend by KPSS tests and the
 seasonality by AICc.}
 
@@ -111,8 +115,10 @@ effects (level 2). See `vignette("theory", package = "lunarcast")`.
 effect and (3) the window of every holiday by AICc on a grid
 (coordinate-wise, linear window shares, non-seasonal ARIMA errors);
 (4) optionally outliers outside two-level holiday periods; (5) the trend
-and seasonal structure by calendar-aware cross-validation with a
-one-standard-error rule (`select = "cv"`) or by KPSS tests and AICc
+and seasonal structure: the trend type follows KPSS tests (a deterministic
+trend is considered only if they indicate trend stationarity) and the
+seasonality is chosen by calendar-aware cross-validation with a
+one-standard-error rule (`select = "cv"`), or by AICc
 (`select = "aicc"`); (6) the final ARIMA order by [forecast::auto.arima()]
 (for stochastic seasonality the seasonal order comes from a small grid);
 (7) the level-2 rule by one-step-ahead cross-validation on the sequence of

@@ -34,3 +34,13 @@
 
 # Occurrence date from a column name "holiday_YYYYMMDD"
 .col_date <- function(cols) as.Date(sub(".*_", "", cols), format = "%Y%m%d")
+
+# TRUE if the ARMA part is stationary and invertible (roots outside the unit
+# circle, with a small margin)
+.arma_ok <- function(fit, tol = 1.001) {
+  outside <- function(p) {
+    p <- p[seq_len(max(c(0, which(abs(p) > 1e-10))))]
+    !length(p) || all(Mod(polyroot(c(1, p))) > tol)
+  }
+  outside(-fit$model$phi) && outside(fit$model$theta)
+}

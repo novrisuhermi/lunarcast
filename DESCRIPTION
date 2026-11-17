@@ -1,7 +1,7 @@
 Package: lunarcast
 Type: Package
 Title: Calendar Variation Models for Time Series with Moving Holidays
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Novri", "Suhermi", email = "novri.suhermi@its.ac.id",
     role = c("aut", "cre"))
 Description: Forecasts monthly and quarterly time series affected by moving

@@ -79,11 +79,11 @@ legend("topright", c("observed", "classical m6", "lunarcast"), bty = "n",
        col = c("grey40", "darkorange", "royalblue"), lwd = c(2, 1.5, 1.5))
 ```
 
-In 2025 the classical m6 model is the most accurate. A single test year is,
-however, a fragile basis for comparison: in 2025 Eid al-Adha fell in June for
-the third year in a row, the ideal situation for a seasonal ARIMA model, which
-simply repeats last year's June. The difficult years are those in which the
-holiday moves to another month, and they do not occur every year.
+A single test year is a fragile basis for comparison. In 2025 Eid al-Adha
+fell in June for the third year in a row, the ideal situation for a seasonal
+ARIMA model, which simply repeats last year's June, so the classical m6 model
+also does well. The difficult years are those in which the holiday moves to
+another month, and they do not occur every year.
 
 ## Fourteen test years: rolling origin
 
@@ -98,11 +98,10 @@ r$model <- factor(r$model, levels = unique(r$model))
 rolling_summary(r)
 ```
 
-The lunarcast rows differ only in how the trend and seasonal structure is
-chosen: by AICc (`lunarcast_aicc`), fixed without seasonality
-(`lunarcast_none`), by cross-validation with the smallest error
-(`lunarcast_cv_min`) or by cross-validation with the one-standard-error rule
-(`lunarcast`, the default). The code that produced the file is shown at the
+The lunarcast rows differ only in how the seasonal structure is chosen: by
+AICc (`lunarcast_aicc`), fixed without seasonality (`lunarcast_none`) or by
+cross-validation with the one-standard-error rule (`lunarcast`, the
+default). The code that produced the file is shown at the
 end of this vignette.
 
 ```{r rolling-plot}
@@ -123,8 +122,8 @@ What the table shows:
   models with seasonal dummies or Fourier terms (m1 to m4) are clearly worse,
   because the dummies of the months in which the holiday used to fall keep
   predicting peaks after the holiday has moved.
-* lunarcast lowers the overall RMSE from 7.95 to 5.00 and the RMSE in
-  holiday months from 20.25 to 8.06 (about 60%).
+* lunarcast lowers the overall RMSE from 7.95 to 4.94 and the RMSE in
+  holiday months from 20.25 to 8.30 (about 60%).
 * Choosing the structure by AICc picks seasonal ARIMA errors at most origins
   and gives a clearly worse forecast than cross-validation: a good in-sample
   fit is not the same as a good forecast.
@@ -150,10 +149,9 @@ lunarcast_variant <- function(...) {
   }
 }
 lunarcast_models <- list(
-  lunarcast_aicc   = function(y, h) forecast(lunarcast(y, hol, select = "aicc"), h = h)$mean,
-  lunarcast_none   = lunarcast_variant(season = "none", select = "aicc"),
-  lunarcast_cv_min = lunarcast_variant(cv_rule = "min"),
-  lunarcast        = lunarcast_variant()
+  lunarcast_aicc = function(y, h) forecast(lunarcast(y, hol, select = "aicc"), h = h)$mean,
+  lunarcast_none = lunarcast_variant(season = "none", select = "aicc"),
+  lunarcast      = lunarcast_variant()
 )
 r <- rolling_origin(sapi, adha, c(classic_models, lunarcast_models), first = 2012)
 rolling_summary(r)

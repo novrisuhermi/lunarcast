@@ -219,14 +219,20 @@ Three design choices matter.
   `sapi`, the advantage of seasonal ARMA errors over the best deterministic
   seasonality falls from 67 AICc points with a dummy calendar to 14 with the
   selected calendar.
-* **Cross-validation, not AICc, chooses the structure.** Information criteria
-  cannot compare models with different orders of differencing, and a good
-  in-sample fit is not a good forecast. lunarcast refits every candidate
-  structure at the end of each of the last `cv_years` years (five by default),
-  forecasts the next year with the full calendar machinery and computes the
-  RMSE. By default it applies the **one-standard-error rule**: among the
-  structures whose cross-validated RMSE is within one standard error of the
-  best, it takes the simplest,
+* **Tests choose the trend, cross-validation chooses the seasonality.**
+  Information criteria cannot compare models with different orders of
+  differencing. lunarcast therefore lets KPSS tests decide the trend, as
+  `auto.arima()` does: a stochastic trend (differencing) is always a
+  candidate, and a deterministic linear trend only when the tests indicate
+  that the series is trend-stationary, because extrapolating a straight line
+  is risky when the slope of the series has changed (as in `sapi`, which rose
+  until 2019 and fell afterwards). The seasonal structure is then chosen by
+  forecasting, since a good in-sample fit is not a good forecast: lunarcast
+  refits every candidate at the end of each of the last `cv_years` years
+  (five by default), forecasts the next year with the full calendar machinery
+  and computes the RMSE. By default it applies the **one-standard-error
+  rule**: among the structures whose cross-validated RMSE is within one
+  standard error of the best, it takes the simplest,
 
 $$
 c^\ast = \arg\min_c \{\kappa_c : \mathrm{CV}_c \le \mathrm{CV}_{\min} + \mathrm{SE}_{\min}\},
@@ -234,7 +240,11 @@ $$
 
   where $\kappa_c$ counts the structural parameters (trend slope, Fourier or
   dummy columns, seasonal ARMA terms). Simple structures are less likely to
-  repeat last year's anomalies.
+  repeat last year's anomalies. With `trend = "cv"` the deterministic and
+  stochastic trends are compared by cross-validation as well. Every model,
+  including those refitted during cross-validation, is required to be
+  stationary and invertible; a fit that is not is re-estimated by maximum
+  likelihood.
 
 ## 8. Outliers
 
@@ -286,8 +296,8 @@ makes from the data instead of assuming it.
 2. For every holiday, choose a constant or two-level effect by AICc.
 3. For every holiday, choose the window $(a_h, b_h)$ on a grid by AICc.
 4. Optionally, detect outliers outside the two-level holiday periods.
-5. Choose the trend and seasonal structure by calendar-aware
-   cross-validation with the one-standard-error rule.
+5. Choose the trend type with KPSS tests and the seasonal structure by
+   calendar-aware cross-validation with the one-standard-error rule.
 6. Fit the final model by maximum likelihood, with the ARIMA order chosen by
    `auto.arima()` and the window shares mapped to the log scale.
 7. Choose the level-2 rule for every two-level holiday.

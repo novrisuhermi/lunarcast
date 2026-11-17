@@ -23,8 +23,10 @@
 #' effect and (3) the window of every holiday by AICc on a grid
 #' (coordinate-wise, linear window shares, non-seasonal ARIMA errors);
 #' (4) optionally outliers outside two-level holiday periods; (5) the trend
-#' and seasonal structure by calendar-aware cross-validation with a
-#' one-standard-error rule (`select = "cv"`) or by KPSS tests and AICc
+#' and seasonal structure: the trend type follows KPSS tests (a deterministic
+#' trend is considered only if they indicate trend stationarity) and the
+#' seasonality is chosen by calendar-aware cross-validation with a
+#' one-standard-error rule (`select = "cv"`), or by AICc
 #' (`select = "aicc"`); (6) the final ARIMA order by [forecast::auto.arima()]
 #' (for stochastic seasonality the seasonal order comes from a small grid);
 #' (7) the level-2 rule by one-step-ahead cross-validation on the sequence of
@@ -43,11 +45,15 @@
 #'   `NULL` none.
 #' @param share `"level"` maps window shares to the log scale (only for
 #'   `lambda = 0`); `"linear"` uses them as they are.
-#' @param trend `"auto"`, `"none"`, `"deterministic"` or `"stochastic"`.
+#' @param trend `"auto"` (default): KPSS tests decide whether the series is
+#'   trend-stationary; a deterministic trend is a candidate only if they do,
+#'   a stochastic trend (differencing) always. `"cv"` compares deterministic
+#'   and stochastic trends by cross-validation. `"none"`, `"deterministic"`
+#'   or `"stochastic"` fix the trend.
 #' @param season `"auto"`, `"none"`, `"dummy"`, `"fourier"` or `"stochastic"`.
-#' @param select `"cv"` compares the candidate structures (deterministic and
-#'   stochastic trend, each with no, Fourier, dummy or stochastic seasonality)
-#'   by one-year-ahead forecasts from `cv_years` origins one year apart at the
+#' @param select `"cv"` compares the candidate structures (the trends allowed
+#'   by `trend`, each with no, Fourier, dummy or stochastic seasonality) by
+#'   one-year-ahead forecasts from `cv_years` origins one year apart at the
 #'   end of the sample; `"aicc"` chooses the trend by KPSS tests and the
 #'   seasonality by AICc.
 #' @param cv_years Number of forecast origins for `select = "cv"`.
@@ -88,7 +94,7 @@ lunarcast <- function(y, holidays, effect = "auto", window = "auto",
                    grid = list(pre = c(0, 3, 7, 14, 28), post = c(0, 3, 7, 14)),
                    level2 = "auto", k = 3, lambda = 0,
                    share = c("level", "linear"),
-                   trend = c("auto", "none", "deterministic", "stochastic"),
+                   trend = c("auto", "cv", "none", "deterministic", "stochastic"),
                    season = c("auto", "none", "dummy", "fourier", "stochastic"),
                    select = c("cv", "aicc"), cv_years = 5,
                    cv_rule = c("1se", "min"),
@@ -121,7 +127,8 @@ lunarcast <- function(y, holidays, effect = "auto", window = "auto",
   calX <- function(win, eff) .cal_fit_X(holidays, win, eff, y)
 
   # (1) preliminary trend, given dummy windows and constant effects
-  st <- .select_trend(z, cbind(calX(win, eff)$X, xin), trend)
+  st <- .select_trend(z, cbind(calX(win, eff)$X, xin),
+                      if (trend == "cv") "auto" else trend)
   Xt <- .struct_X(st, y)
   if (any(effect == "auto") || any(window == "auto") || outliers) {
     base <- auto.arima(z, xreg = cbind(calX(win, eff)$X, Xt, xin), d = st$d,
@@ -177,8 +184,10 @@ lunarcast <- function(y, holidays, effect = "auto", window = "auto",
   if (select == "aicc") {
     st <- .select_season(z, cbind(cb$X, Xt, xin, Xo), st, season, ...)
   } else {
-    trends <- if (trend == "auto")
-      unique(c(st$trend, "deterministic", "stochastic")) else st$trend
+    trends <- switch(trend,
+      auto = unique(c(st$trend, "stochastic")),   # deterministic only if KPSS
+      cv   = c("deterministic", "stochastic"),    # supports trend stationarity
+      st$trend)
     cands <- .structure_candidates(z, cbind(cb$X, xin, Xo), trends, season, ...)
     st <- cands[[1]]
     if (length(cands) > 1) {
@@ -209,14 +218,21 @@ lunarcast <- function(y, holidays, effect = "auto", window = "auto",
   xin <- if (is.null(xreg)) NULL else xreg[seq_len(n), , drop = FALSE]
   cb  <- .cal_fit_X(holidays, win, eff, y)
   X   <- cbind(cb$X, .struct_X(st, y), xin, .outlier_X(outliers, n))
-  arma <- function(X, ord, sord, cst) {            # fall back if ML fails
-    for (m in unique(c(method, "CSS-ML", "CSS"))) {
-      fit <- tryCatch(Arima(z, order = ord, seasonal = sord, xreg = X,
-                            include.constant = cst, method = m),
+  arma <- function(X, ord, sord, cst) {
+    # try the requested method first; a fit that fails or is not stationary
+    # and invertible is re-estimated with full maximum likelihood
+    best <- NULL
+    for (m in unique(c(method, "CSS-ML", "ML", "CSS"))) {
+      fit <- tryCatch(suppressWarnings(Arima(z, order = ord, seasonal = sord,
+                                             xreg = X, include.constant = cst,
+                                             method = m)),
                       error = function(e) NULL)
-      if (!is.null(fit)) return(fit)
+      if (is.null(fit)) next
+      if (.arma_ok(fit)) return(fit)
+      if (is.null(best)) best <- fit
     }
-    stop("ARIMA estimation failed.")
+    if (is.null(best)) stop("ARIMA estimation failed.")
+    best
   }
   fit <- if (search && st$season != "stochastic")
     auto.arima(z, xreg = X, d = st$d, seasonal = FALSE, ...)
@@ -235,7 +251,8 @@ lunarcast <- function(y, holidays, effect = "auto", window = "auto",
       fit <- f2
     }
   }
-  se <- sqrt(diag(vcov(fit)))
+  v  <- diag(vcov(fit))
+  se <- sqrt(ifelse(is.finite(v) & v > 0, v, NA_real_))
   effects <- l2 <- list()
   for (nm in names(holidays)) {
     cn <- cb$cols[[nm]]

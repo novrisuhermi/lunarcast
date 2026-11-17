@@ -39,11 +39,11 @@ lunarcast relaxes each of its assumptions:
 * **Two-level effects.** Every occurrence of a holiday gets its own effect
   (level 1), and the effect of the next occurrence is forecast from the
   sequence of past effects (level 2), with its uncertainty.
-* **Calendar-aware selection.** The trend and seasonal structure (the six
-  structures of the classical approach, plus no seasonality) is chosen by
-  cross-validated forecasts with a one-standard-error rule, after the calendar
-  part has been specified, so that the seasonal part cannot absorb the
-  holiday effect.
+* **Calendar-aware selection.** After the calendar part has been specified,
+  so that the seasonal part cannot absorb the holiday effect, the trend type
+  is chosen by KPSS tests and the seasonality (none, Fourier terms, dummies or
+  seasonal ARIMA, the building blocks of the six classical structures) by
+  cross-validated forecasts with a one-standard-error rule.
 
 The classical model is included too (`calvar_classic()`), as a benchmark and
 as a special case of lunarcast.
@@ -148,7 +148,7 @@ Fourteen test years (2012 to 2025) of rolling-origin forecasts of `sapi`
 | Classical m1 (deterministic trend, dummies) | 10.42 | 27.12 |
 | Classical m6 (stochastic trend and seasonality), best classical | 7.95 | 20.25 |
 | lunarcast, structure chosen by AICc | 5.73 | 12.28 |
-| **lunarcast (default)** | **5.00** | **8.06** |
+| **lunarcast (default)** | **4.94** | **8.30** |
 
 These results come from a single series; they show what the method can do,
 not a general ranking.

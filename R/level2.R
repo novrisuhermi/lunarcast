@@ -6,7 +6,9 @@
     mean  = rep(mean(tail(a, k)), m),
     wmean = {                                   # precision-weighted mean
       w <- 1 / tail(se, k)^2
-      rep(sum(w * tail(a, k)) / sum(w), m)
+      ok <- is.finite(w)
+      rep(if (any(ok)) sum(w[ok] * tail(a, k)[ok]) / sum(w[ok])
+          else mean(tail(a, k)), m)
     },
     rw    = rep(tail(a, 1), m),
     ses   = as.numeric(ses(a, h = m)$mean),
