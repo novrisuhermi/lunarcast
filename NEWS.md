@@ -11,6 +11,8 @@
   is not invertible" warnings.
 * The precision-weighted level-2 rule (`wmean`) ignores occurrences without
   a standard error.
+* The vignettes are published already run and rendered, as on CRAN, at
+  <https://novrisuhermi.github.io/lunarcast/vignettes/>.
 * Rolling-origin results for `sapi` updated: RMSE 4.94 (was 5.00); the 2025
   forecast error drops from 4.40 to 1.83.
 

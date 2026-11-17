@@ -48,8 +48,8 @@ GitHub:
 pak::pak("novrisuhermi/lunarcast")
 ```
 
-To also build the vignettes (tutorial, theory, comparison and an
-Indonesian guide):
+`pak::pak()` does not build the vignettes; read them online at
+<https://novrisuhermi.github.io/lunarcast/vignettes/> or install with:
 
 ``` r
 # install.packages("remotes")
@@ -222,13 +222,20 @@ do, not a general ranking.
 
 ## Learn more
 
-- `vignette("lunarcast")`: get started, a complete analysis step by
-  step.
-- `vignette("theory")`: how lunarcast works.
-- `vignette("classic-vs-lunarcast")`: the classical model and the
-  evaluation.
-- `vignette("panduan-indonesia")`: panduan dalam Bahasa Indonesia.
-- Website: <https://novrisuhermi.github.io/lunarcast/>
+The vignettes are available already run and rendered, as on CRAN, at
+<https://novrisuhermi.github.io/lunarcast/vignettes/>:
+
+- [Get started with lunarcast](https://novrisuhermi.github.io/lunarcast/vignettes/lunarcast.html): a complete
+  analysis step by step.
+- [How lunarcast works](https://novrisuhermi.github.io/lunarcast/vignettes/theory.html): the theory, with
+  equations.
+- [From the classical model to lunarcast](https://novrisuhermi.github.io/lunarcast/vignettes/classic-vs-lunarcast.html):
+  the classical models m1 to m6 and the evaluation.
+- [Panduan lunarcast (Bahasa Indonesia)](https://novrisuhermi.github.io/lunarcast/vignettes/panduan-indonesia.html):
+  panduan dalam Bahasa Indonesia.
+
+The package website, <https://novrisuhermi.github.io/lunarcast/>, has the
+same articles and the reference of every function.
 
 ## Ringkasan (Bahasa Indonesia)
 
