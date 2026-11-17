@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">lunarcast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -145,12 +145,13 @@ kejadian berikutnya diramal dari deret efek sebelumnya (level 2): <span class="k
 dipilih dari rata-rata, rata-rata tertimbang, <em>random walk</em>, SES,
 atau damped Holt lewat validasi silang.</li>
 <li>
-<strong>Struktur tren dan musiman via validasi silang.</strong> Enam
-struktur model klasik (tren deterministik/stokastik × musiman
-dummy/Fourier/stokastik), ditambah opsi tanpa musiman, dibandingkan
-lewat ramalan satu tahun ke depan dari beberapa titik asal. Aturan satu
-galat baku memilih struktur paling sederhana yang galatnya masih dalam
-satu galat baku dari yang terbaik.</li>
+<strong>Struktur tren dan musiman.</strong> Jenis tren ditentukan
+uji KPSS: tren stokastik selalu menjadi kandidat, sedangkan tren
+deterministik hanya bila uji menunjukkan deret stasioner di sekitar
+tren. Musiman (tanpa musiman, Fourier, dummy, atau SARMA) dipilih lewat
+ramalan satu tahun ke depan dari beberapa titik asal (validasi silang).
+Aturan satu galat baku memilih struktur paling sederhana yang galatnya
+masih dalam satu galat baku dari yang terbaik.</li>
 <li>
 <strong>Outlier (opsional).</strong> AO, LS, dan TC dideteksi di
 luar periode hari raya.</li>
@@ -261,8 +262,8 @@ Grafik efek per kejadian beserta ramalan untuk kejadian berikutnya:</p>
 <p>Keenam model klasik (m1 sampai m6) dapat diestimasi sekaligus dengan
 <code><a href="../reference/calvar_classic_all.html">calvar_classic_all()</a></code>. Pada evaluasi <em>rolling origin</em>
 14 tahun (2012–2025), model klasik terbaik (m6) memiliki RMSE 7,95,
-sedangkan lunarcast 5,00; di bulan hari raya, RMSE turun dari 20,25
-menjadi 8,06. Rinciannya ada di
+sedangkan lunarcast 4,94; di bulan hari raya, RMSE turun dari 20,25
+menjadi 8,30. Rinciannya ada di
 <code><a href="../articles/classic-vs-lunarcast.html">vignette("classic-vs-lunarcast")</a></code>.</p>
 </div>
 <div class="section level2">

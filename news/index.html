@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">lunarcast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,6 +58,13 @@
       <small>Source: <a href="https://github.com/novrisuhermi/lunarcast/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.1" id="lunarcast-011">lunarcast 0.1.1<a class="anchor" aria-label="anchor" href="#lunarcast-011"></a></h2>
+<ul><li>The trend type now follows KPSS tests by default (<code>trend = "auto"</code>): a stochastic trend is always a candidate and a deterministic linear trend only when the tests indicate trend stationarity. This avoids extrapolating a straight line when the slope of a series has changed. <code>trend = "cv"</code> compares both trend types by cross-validation, as in 0.1.0.</li>
+<li>Every ARIMA model, including those refitted during cross-validation, must be stationary and invertible; a fit that is not is re-estimated by maximum likelihood. Fitting no longer produces “NaNs produced” or “MA part of model is not invertible” warnings.</li>
+<li>The precision-weighted level-2 rule (<code>wmean</code>) ignores occurrences without a standard error.</li>
+<li>Rolling-origin results for <code>sapi</code> updated: RMSE 4.94 (was 5.00); the 2025 forecast error drops from 4.40 to 1.83.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="lunarcast-010">lunarcast 0.1.0<a class="anchor" aria-label="anchor" href="#lunarcast-010"></a></h2>
 <p>First release.</p>

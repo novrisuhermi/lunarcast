@@ -14,7 +14,7 @@ selects the whole specification automatically."><meta property="og:image" conten
     
     <a class="navbar-brand me-2" href="../index.html">lunarcast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,7 +81,7 @@ selects the whole specification automatically.</p>
 <span>  k <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  lambda <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  share <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"level"</span>, <span class="st">"linear"</span><span class="op">)</span>,</span>
-<span>  trend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"none"</span>, <span class="st">"deterministic"</span>, <span class="st">"stochastic"</span><span class="op">)</span>,</span>
+<span>  trend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"cv"</span>, <span class="st">"none"</span>, <span class="st">"deterministic"</span>, <span class="st">"stochastic"</span><span class="op">)</span>,</span>
 <span>  season <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"none"</span>, <span class="st">"dummy"</span>, <span class="st">"fourier"</span>, <span class="st">"stochastic"</span><span class="op">)</span>,</span>
 <span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cv"</span>, <span class="st">"aicc"</span><span class="op">)</span>,</span>
 <span>  cv_years <span class="op">=</span> <span class="fl">5</span>,</span>
@@ -137,7 +137,11 @@ selects the whole specification automatically.</p>
 
 
 <dt>trend</dt>
-<dd><p>`"auto"`, `"none"`, `"deterministic"` or `"stochastic"`.</p></dd>
+<dd><p>`"auto"` (default): KPSS tests decide whether the series is
+trend-stationary; a deterministic trend is a candidate only if they do,
+a stochastic trend (differencing) always. `"cv"` compares deterministic
+and stochastic trends by cross-validation. `"none"`, `"deterministic"`
+or `"stochastic"` fix the trend.</p></dd>
 
 
 <dt>season</dt>
@@ -145,9 +149,9 @@ selects the whole specification automatically.</p>
 
 
 <dt>select</dt>
-<dd><p>`"cv"` compares the candidate structures (deterministic and
-stochastic trend, each with no, Fourier, dummy or stochastic seasonality)
-by one-year-ahead forecasts from `cv_years` origins one year apart at the
+<dd><p>`"cv"` compares the candidate structures (the trends allowed
+by `trend`, each with no, Fourier, dummy or stochastic seasonality) by
+one-year-ahead forecasts from `cv_years` origins one year apart at the
 end of the sample; `"aicc"` chooses the trend by KPSS tests and the
 seasonality by AICc.</p></dd>
 
@@ -219,8 +223,10 @@ effects (level 2). See `vignette("theory", package = "lunarcast")`.</p>
 effect and (3) the window of every holiday by AICc on a grid
 (coordinate-wise, linear window shares, non-seasonal ARIMA errors);
 (4) optionally outliers outside two-level holiday periods; (5) the trend
-and seasonal structure by calendar-aware cross-validation with a
-one-standard-error rule (`select = "cv"`) or by KPSS tests and AICc
+and seasonal structure: the trend type follows KPSS tests (a deterministic
+trend is considered only if they indicate trend stationarity) and the
+seasonality is chosen by calendar-aware cross-validation with a
+one-standard-error rule (`select = "cv"`), or by AICc
 (`select = "aicc"`); (6) the final ARIMA order by [forecast::auto.arima()]
 (for stochastic seasonality the seasonal order comes from a small grid);
 (7) the level-2 rule by one-step-ahead cross-validation on the sequence of

@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">lunarcast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -172,15 +172,11 @@ everything in July. You do not need to build these regressors yourself;
 <span><span class="co">#&gt; lunarcast: Regression with ARIMA(5,1,1)(2,0,0)[12] errors | AICc = -296.9 </span></span>
 <span><span class="co">#&gt; Structure (cv, 1se): stochastic + SARMA(2,0,0), d = 1</span></span>
 <span><span class="co">#&gt; Cross-validated RMSE of the candidate structures:</span></span>
-<span><span class="co">#&gt;                     structure RMSE    SE</span></span>
-<span><span class="co">#&gt;     stochastic + SARMA(2,0,0) 4.53 1.017</span></span>
-<span><span class="co">#&gt;     stochastic + fourier(K=4) 5.08 0.821</span></span>
-<span><span class="co">#&gt;            stochastic + dummy 5.10 0.795</span></span>
-<span><span class="co">#&gt;  deterministic + SARMA(2,0,0) 5.52 0.781</span></span>
-<span><span class="co">#&gt;             stochastic + none 5.86 0.962</span></span>
-<span><span class="co">#&gt;          deterministic + none 7.72 1.446</span></span>
-<span><span class="co">#&gt;         deterministic + dummy 8.24 1.570</span></span>
-<span><span class="co">#&gt;  deterministic + fourier(K=4) 8.31 1.684</span></span>
+<span><span class="co">#&gt;                  structure RMSE    SE</span></span>
+<span><span class="co">#&gt;  stochastic + SARMA(2,0,0) 4.53 1.017</span></span>
+<span><span class="co">#&gt;  stochastic + fourier(K=4) 5.08 0.821</span></span>
+<span><span class="co">#&gt;         stochastic + dummy 5.10 0.795</span></span>
+<span><span class="co">#&gt;          stochastic + none 5.86 0.962</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; adha: two-level effect, window [-3, +7] days, level 2 = wmean (CV-RMSE 0.13)</span></span>
 <span><span class="co">#&gt;       event   alpha     se ratio</span></span>
@@ -216,11 +212,11 @@ everything in July. You do not need to build these regressors yourself;
 <li>The first line is the fitted regression with ARIMA errors and its
 AICc.</li>
 <li>
-<code>Structure</code> is the trend and seasonal structure chosen by
-cross-validation; <code>CV-RMSE (SE)</code> lists all candidates with
-their cross-validated error and its standard error. The default one-SE
-rule takes the simplest structure within one standard error of the
-best.</li>
+<code>Structure</code> is the selected trend and seasonal structure.
+The trend type comes from KPSS tests; the table below it lists the
+candidate seasonal structures with their cross-validated RMSE and its
+standard error. The default one-SE rule takes the simplest structure
+within one standard error of the best.</li>
 <li>For each holiday you see whether its effect is <code>constant</code>
 or <code>two-level</code>, the selected window in days around the
 holiday and, for two-level effects, the level-2 rule used to forecast
@@ -327,7 +323,9 @@ faster.</p>
 <code>trend</code>, <code>season</code>
 </td>
 <td align="left">trend and seasonal structure</td>
-<td align="left"><code>trend = "stochastic", season = "none"</code></td>
+<td align="left">
+<code>trend = "stochastic", season = "none"</code>;
+<code>trend = "cv"</code> compares both trend types</td>
 </tr>
 <tr class="even">
 <td align="left"><code>select</code></td>
