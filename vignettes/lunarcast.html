@@ -541,37 +541,42 @@ faster.</p>
 <td align="left"><code>window = list(adha = c(-3, 7), fitri = c(-28, 3))</code></td>
 </tr>
 <tr class="even">
+<td align="left"><code>window</code></td>
+<td align="left">several windows for one holiday, one effect each</td>
+<td align="left"><code>window = list(adha = list(before = c(-14, -1), holiday = c(0, 3)))</code></td>
+</tr>
+<tr class="odd">
 <td align="left"><code>effect</code></td>
 <td align="left">constant or two-level effect</td>
 <td align="left"><code>effect = list(adha = &quot;two-level&quot;, fitri = &quot;constant&quot;)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>trend</code>, <code>season</code></td>
 <td align="left">trend and seasonal structure</td>
 <td align="left"><code>trend = &quot;stochastic&quot;, season = &quot;none&quot;</code>;
 <code>trend = &quot;cv&quot;</code> compares both trend types</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>select</code></td>
 <td align="left">how the structure is chosen</td>
 <td align="left"><code>select = &quot;aicc&quot;</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>cv_rule</code>, <code>cv_years</code></td>
 <td align="left">cross-validation rule and origins</td>
 <td align="left"><code>cv_rule = &quot;min&quot;, cv_years = 3</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>level2</code></td>
 <td align="left">rule for future effects</td>
 <td align="left"><code>level2 = list(adha = &quot;rw&quot;)</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>outliers</code></td>
 <td align="left">detect AO, LS and TC outliers</td>
 <td align="left"><code>outliers = TRUE</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>lambda</code></td>
 <td align="left">transformation (<code>0</code> = log)</td>
 <td align="left"><code>lambda = NULL</code> for additive effects</td>
@@ -624,11 +629,35 @@ m1 to m6:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>m6 <span class="ot">&lt;-</span> <span class="fu">calvar_classic</span>(sapi, adha, <span class="at">trend =</span> <span class="st">&quot;stochastic&quot;</span>, <span class="at">season =</span> <span class="st">&quot;stochastic&quot;</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>m6</span>
 <span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; Classical calendar variation model: stochastic trend + stochastic seasonality </span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; Regression with ARIMA(1,1,1)(1,0,2)[12] errors | AICc = 1708.9 </span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; Holiday effect (same every year): 18.92 (s.e. 2.01), original scale</span></span></code></pre></div>
-<p><code>calvar_classic_all()</code> fits all six at once, and
-<code>forecast()</code> works for both kinds of models. The two
-approaches are compared in
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; Calendar design: holiday dummy </span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; Regression with ARIMA(1,1,1)(1,0,2)[12] errors | AICc = 1708.9 </span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; Holiday effects (same every year, original scale):</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt;     term estimate   se</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt;  holiday    18.92 2.01</span></span></code></pre></div>
+<p>Besides the holiday-month dummy, the classical model has two other
+calendar designs: <code>design = &quot;leadlag&quot;</code> adds dummies for the
+months before and after the holiday, and <code>design = &quot;window&quot;</code>
+uses proportional windows (Bell and Hillmer, 1983), by default the days
+before the holiday, whose number is chosen by AICc, and the holiday with
+the three following days:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">calvar_classic</span>(sapi, adha, <span class="at">trend =</span> <span class="st">&quot;stochastic&quot;</span>, <span class="at">season =</span> <span class="st">&quot;stochastic&quot;</span>,</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>               <span class="at">design =</span> <span class="st">&quot;window&quot;</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; Classical calendar variation model: stochastic trend + stochastic seasonality </span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; Calendar design: proportional windows: before [-14, -1] days, holiday [0, +3] days </span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; Regression with ARIMA(2,1,2)(2,0,0)[12] errors | AICc = 1654 </span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; Holiday effects (same every year, original scale):</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt;     term estimate    se</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt;   before    5.895 2.185</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt;  holiday   22.082 1.651</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt; AICc of the candidate windows:</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt;  window  w    AICc</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt;  before  7 1658.12</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt;  before 14 1653.96</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt;  before 21 1655.52</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt;  before 28 1656.46</span></span></code></pre></div>
+<p><code>calvar_classic_all()</code> fits all six structures at once,
+for one or several designs, and <code>forecast()</code> works for both
+kinds of models. The approaches are compared in
 <code>vignette(&quot;classic-vs-lunarcast&quot;)</code>.</p>
 </div>
 <div id="evaluating-forecasts" class="section level2">
@@ -636,14 +665,14 @@ approaches are compared in
 <p><code>rolling_origin()</code> refits models at the end of every year
 and forecasts the next year; <code>rolling_summary()</code> reports the
 RMSE overall, in holiday months, in years in which the holiday moved to
-another month, and the median of the yearly RMSEs.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="at">classic_m6 =</span> <span class="cf">function</span>(y, h)</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>    <span class="fu">forecast</span>(<span class="fu">calvar_classic</span>(y, adha, <span class="st">&quot;stochastic&quot;</span>, <span class="st">&quot;stochastic&quot;</span>), <span class="at">h =</span> h)<span class="sc">$</span>mean,</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="at">lunarcast  =</span> <span class="cf">function</span>(y, h) <span class="fu">forecast</span>(<span class="fu">lunarcast</span>(y, hol), <span class="at">h =</span> h)<span class="sc">$</span>mean</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>)</span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fu">rolling_origin</span>(sapi, adha, models, <span class="at">first =</span> <span class="dv">2012</span>)</span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="fu">rolling_summary</span>(r)</span></code></pre></div>
+another month, and the mean and median of the yearly RMSEs.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="at">classic_m6 =</span> <span class="cf">function</span>(y, h)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>    <span class="fu">forecast</span>(<span class="fu">calvar_classic</span>(y, adha, <span class="st">&quot;stochastic&quot;</span>, <span class="st">&quot;stochastic&quot;</span>), <span class="at">h =</span> h)<span class="sc">$</span>mean,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  <span class="at">lunarcast  =</span> <span class="cf">function</span>(y, h) <span class="fu">forecast</span>(<span class="fu">lunarcast</span>(y, hol), <span class="at">h =</span> h)<span class="sc">$</span>mean</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>)</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fu">rolling_origin</span>(sapi, adha, models, <span class="at">first =</span> <span class="dv">2012</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="fu">rolling_summary</span>(r)</span></code></pre></div>
 <p><code>forecast_accuracy()</code> gives RMSE, MAE, MAPE and sMAPE for
 a single test period.</p>
 </div>

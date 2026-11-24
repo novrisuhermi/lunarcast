@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">lunarcast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -314,11 +314,16 @@ faster.</p>
 <td align="left"><code>window = list(adha = c(-3, 7), fitri = c(-28, 3))</code></td>
 </tr>
 <tr class="even">
+<td align="left"><code>window</code></td>
+<td align="left">several windows for one holiday, one effect each</td>
+<td align="left"><code>window = list(adha = list(before = c(-14, -1), holiday = c(0, 3)))</code></td>
+</tr>
+<tr class="odd">
 <td align="left"><code>effect</code></td>
 <td align="left">constant or two-level effect</td>
 <td align="left"><code>effect = list(adha = "two-level", fitri = "constant")</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">
 <code>trend</code>, <code>season</code>
 </td>
@@ -327,29 +332,29 @@ faster.</p>
 <code>trend = "stochastic", season = "none"</code>;
 <code>trend = "cv"</code> compares both trend types</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>select</code></td>
 <td align="left">how the structure is chosen</td>
 <td align="left"><code>select = "aicc"</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">
 <code>cv_rule</code>, <code>cv_years</code>
 </td>
 <td align="left">cross-validation rule and origins</td>
 <td align="left"><code>cv_rule = "min", cv_years = 3</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>level2</code></td>
 <td align="left">rule for future effects</td>
 <td align="left"><code>level2 = list(adha = "rw")</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>outliers</code></td>
 <td align="left">detect AO, LS and TC outliers</td>
 <td align="left"><code>outliers = TRUE</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>lambda</code></td>
 <td align="left">transformation (<code>0</code> = log)</td>
 <td align="left">
@@ -406,11 +411,36 @@ m1 to m6:</p>
 <code class="sourceCode R"><span><span class="va">m6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calvar_classic.html">calvar_classic</a></span><span class="op">(</span><span class="va">sapi</span>, <span class="va">adha</span>, trend <span class="op">=</span> <span class="st">"stochastic"</span>, season <span class="op">=</span> <span class="st">"stochastic"</span><span class="op">)</span></span>
 <span><span class="va">m6</span></span>
 <span><span class="co">#&gt; Classical calendar variation model: stochastic trend + stochastic seasonality </span></span>
+<span><span class="co">#&gt; Calendar design: holiday dummy </span></span>
 <span><span class="co">#&gt; Regression with ARIMA(1,1,1)(1,0,2)[12] errors | AICc = 1708.9 </span></span>
-<span><span class="co">#&gt; Holiday effect (same every year): 18.92 (s.e. 2.01), original scale</span></span></code></pre></div>
-<p><code><a href="../reference/calvar_classic_all.html">calvar_classic_all()</a></code> fits all six at once, and
-<code><a href="https://rdrr.io/pkg/generics/man/forecast.html" class="external-link">forecast()</a></code> works for both kinds of models. The two
-approaches are compared in
+<span><span class="co">#&gt; Holiday effects (same every year, original scale):</span></span>
+<span><span class="co">#&gt;     term estimate   se</span></span>
+<span><span class="co">#&gt;  holiday    18.92 2.01</span></span></code></pre></div>
+<p>Besides the holiday-month dummy, the classical model has two other
+calendar designs: <code>design = "leadlag"</code> adds dummies for the
+months before and after the holiday, and <code>design = "window"</code>
+uses proportional windows (Bell and Hillmer, 1983), by default the days
+before the holiday, whose number is chosen by AICc, and the holiday with
+the three following days:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/calvar_classic.html">calvar_classic</a></span><span class="op">(</span><span class="va">sapi</span>, <span class="va">adha</span>, trend <span class="op">=</span> <span class="st">"stochastic"</span>, season <span class="op">=</span> <span class="st">"stochastic"</span>,</span>
+<span>               design <span class="op">=</span> <span class="st">"window"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Classical calendar variation model: stochastic trend + stochastic seasonality </span></span>
+<span><span class="co">#&gt; Calendar design: proportional windows: before [-14, -1] days, holiday [0, +3] days </span></span>
+<span><span class="co">#&gt; Regression with ARIMA(2,1,2)(2,0,0)[12] errors | AICc = 1654 </span></span>
+<span><span class="co">#&gt; Holiday effects (same every year, original scale):</span></span>
+<span><span class="co">#&gt;     term estimate    se</span></span>
+<span><span class="co">#&gt;   before    5.895 2.185</span></span>
+<span><span class="co">#&gt;  holiday   22.082 1.651</span></span>
+<span><span class="co">#&gt; AICc of the candidate windows:</span></span>
+<span><span class="co">#&gt;  window  w    AICc</span></span>
+<span><span class="co">#&gt;  before  7 1658.12</span></span>
+<span><span class="co">#&gt;  before 14 1653.96</span></span>
+<span><span class="co">#&gt;  before 21 1655.52</span></span>
+<span><span class="co">#&gt;  before 28 1656.46</span></span></code></pre></div>
+<p><code><a href="../reference/calvar_classic_all.html">calvar_classic_all()</a></code> fits all six structures at once,
+for one or several designs, and <code><a href="https://rdrr.io/pkg/generics/man/forecast.html" class="external-link">forecast()</a></code> works for both
+kinds of models. The approaches are compared in
 <code><a href="../articles/classic-vs-lunarcast.html">vignette("classic-vs-lunarcast")</a></code>.</p>
 </div>
 <div class="section level2">
@@ -419,8 +449,8 @@ approaches are compared in
 <p><code><a href="../reference/rolling_origin.html">rolling_origin()</a></code> refits models at the end of every year
 and forecasts the next year; <code><a href="../reference/rolling_summary.html">rolling_summary()</a></code> reports the
 RMSE overall, in holiday months, in years in which the holiday moved to
-another month, and the median of the yearly RMSEs.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+another month, and the mean and median of the yearly RMSEs.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  classic_m6 <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">h</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/generics/man/forecast.html" class="external-link">forecast</a></span><span class="op">(</span><span class="fu"><a href="../reference/calvar_classic.html">calvar_classic</a></span><span class="op">(</span><span class="va">y</span>, <span class="va">adha</span>, <span class="st">"stochastic"</span>, <span class="st">"stochastic"</span><span class="op">)</span>, h <span class="op">=</span> <span class="va">h</span><span class="op">)</span><span class="op">$</span><span class="va">mean</span>,</span>

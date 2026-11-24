@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">lunarcast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -121,6 +121,25 @@ Ketiganya tidak berlaku pada data pencarian “sapi”: Idul Adha 31 Juli
 dari tiga kali lipat sekitar 2015–2019, dan sisa efek yang tidak
 tertangkap dummy bocor ke komponen musiman sehingga muncul “puncak
 hantu” di bulan lama setelah hari raya pindah bulan.</p>
+<p>Selain dummy bulan hari raya, model klasik di lunarcast punya dua
+desain kalender lain melalui argumen <code>design</code>:</p>
+<ul>
+<li>
+<strong>Dummy <em>lead–lag</em></strong>
+(<code>design = "leadlag"</code>): dummy terpisah untuk bulan sebelum,
+bulan, dan bulan sesudah hari raya.</li>
+<li>
+<strong>Jendela proporsional</strong>
+(<code>design = "window"</code>; Bell dan Hillmer, 1983): porsi hari
+dari sebuah jendela yang jatuh di bulan <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span>. Bawaannya memakai jendela <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span></span></span></span> hari sebelum Idul Adha (masa membeli
+hewan kurban), dengan <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>w</mi></mrow><annotation encoding="application/x-tex">w</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span></span></span></span> dipilih
+dengan AICc dari 7, 14, 21, dan 28 hari, serta jendela Idul Adha dan
+tiga hari tasyrik:</li>
+</ul>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>α</mi><mtext>sebelum</mtext></msub><mtext> </mtext><msub><mrow><mi mathvariant="normal">P</mi><mi mathvariant="normal">R</mi><mi mathvariant="normal">E</mi></mrow><mi>t</mi></msub><mo stretchy="false">(</mo><mi>w</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>α</mi><mtext>hari raya</mtext></msub><mtext> </mtext><msub><mrow><mi mathvariant="normal">H</mi><mi mathvariant="normal">O</mi><mi mathvariant="normal">L</mi></mrow><mi>t</mi></msub><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\alpha_{\text{sebelum}}\,\mathrm{PRE}_t(w) + \alpha_{\text{hari
+raya}}\,\mathrm{HOL}_t .</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">sebelum</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">PRE</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0037em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">hari raya</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord"><span class="mord mathrm">HOL</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">.</span></span></span></span></span></p>
+<p>Jendela proporsional memperbaiki asumsi pertama (waktu), tetapi
+efeknya tetap sama setiap tahun.</p>
 </div>
 <div class="section level2">
 <h2 id="yang-dilakukan-lunarcast">Yang dilakukan lunarcast<a class="anchor" aria-label="anchor" href="#yang-dilakukan-lunarcast"></a>
@@ -257,14 +276,47 @@ Grafik efek per kejadian beserta ramalan untuk kejadian berikutnya:</p>
 <code class="sourceCode R"><span><span class="va">m6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calvar_classic.html">calvar_classic</a></span><span class="op">(</span><span class="va">sapi</span>, <span class="va">hol</span><span class="op">$</span><span class="va">adha</span>, trend <span class="op">=</span> <span class="st">"stochastic"</span>, season <span class="op">=</span> <span class="st">"stochastic"</span><span class="op">)</span></span>
 <span><span class="va">m6</span></span>
 <span><span class="co">#&gt; Classical calendar variation model: stochastic trend + stochastic seasonality </span></span>
+<span><span class="co">#&gt; Calendar design: holiday dummy </span></span>
 <span><span class="co">#&gt; Regression with ARIMA(1,1,1)(1,0,2)[12] errors | AICc = 1708.9 </span></span>
-<span><span class="co">#&gt; Holiday effect (same every year): 18.92 (s.e. 2.01), original scale</span></span></code></pre></div>
-<p>Keenam model klasik (m1 sampai m6) dapat diestimasi sekaligus dengan
-<code><a href="../reference/calvar_classic_all.html">calvar_classic_all()</a></code>. Pada evaluasi <em>rolling origin</em>
-14 tahun (2012–2025), model klasik terbaik (m6) memiliki RMSE 7,95,
-sedangkan lunarcast 4,94; di bulan hari raya, RMSE turun dari 20,25
-menjadi 8,30. Rinciannya ada di
-<code><a href="../articles/classic-vs-lunarcast.html">vignette("classic-vs-lunarcast")</a></code>.</p>
+<span><span class="co">#&gt; Holiday effects (same every year, original scale):</span></span>
+<span><span class="co">#&gt;     term estimate   se</span></span>
+<span><span class="co">#&gt;  holiday    18.92 2.01</span></span></code></pre></div>
+<p>Model yang sama dengan jendela proporsional (panjang jendela sebelum
+hari raya dipilih otomatis):</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m6w</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calvar_classic.html">calvar_classic</a></span><span class="op">(</span><span class="va">sapi</span>, <span class="va">hol</span><span class="op">$</span><span class="va">adha</span>, trend <span class="op">=</span> <span class="st">"stochastic"</span>, season <span class="op">=</span> <span class="st">"stochastic"</span>,</span>
+<span>                      design <span class="op">=</span> <span class="st">"window"</span><span class="op">)</span></span>
+<span><span class="va">m6w</span></span>
+<span><span class="co">#&gt; Classical calendar variation model: stochastic trend + stochastic seasonality </span></span>
+<span><span class="co">#&gt; Calendar design: proportional windows: before [-14, -1] days, holiday [0, +3] days </span></span>
+<span><span class="co">#&gt; Regression with ARIMA(2,1,2)(2,0,0)[12] errors | AICc = 1654 </span></span>
+<span><span class="co">#&gt; Holiday effects (same every year, original scale):</span></span>
+<span><span class="co">#&gt;     term estimate    se</span></span>
+<span><span class="co">#&gt;   before    5.895 2.185</span></span>
+<span><span class="co">#&gt;  holiday   22.082 1.651</span></span>
+<span><span class="co">#&gt; AICc of the candidate windows:</span></span>
+<span><span class="co">#&gt;  window  w    AICc</span></span>
+<span><span class="co">#&gt;  before  7 1658.12</span></span>
+<span><span class="co">#&gt;  before 14 1653.96</span></span>
+<span><span class="co">#&gt;  before 21 1655.52</span></span>
+<span><span class="co">#&gt;  before 28 1656.46</span></span></code></pre></div>
+<p>Enam struktur dikali tiga desain menghasilkan 18 model, yang dapat
+diestimasi sekaligus dengan
+<code>calvar_classic_all(sapi, hol$adha, design = c("dummy", "leadlag", "window"))</code>.</p>
+<p>Di <code><a href="../reference/lunarcast.html">lunarcast()</a></code> sendiri, satu hari raya juga dapat diberi
+beberapa jendela proporsional dengan efek masing-masing, misalnya 14
+hari sebelum Idul Adha dan hari raya beserta hari tasyrik:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/lunarcast.html">lunarcast</a></span><span class="op">(</span><span class="va">sapi</span>, <span class="va">hol</span><span class="op">[</span><span class="st">"adha"</span><span class="op">]</span>,</span>
+<span>          window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>adha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>before <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">14</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>, holiday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Pada evaluasi <em>rolling origin</em> 14 tahun (2012–2025), jendela
+proporsional memperbaiki semua struktur klasik: RMSE m6 turun dari 7,95
+(dummy bulan) menjadi 7,30. Namun di bulan hari raya RMSE-nya hanya
+turun dari 20,25 menjadi 19,66, karena efeknya tetap sama setiap tahun.
+lunarcast mencapai RMSE 4,94, dan 8,30 di bulan hari raya. Memecah Idul
+Adha menjadi dua jendela klasik di dalam lunarcast justru kurang akurat
+(7,76) dibanding satu jendela yang dipilihnya dengan AICc. Rinciannya
+ada di <code><a href="../articles/classic-vs-lunarcast.html">vignette("classic-vs-lunarcast")</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="fungsi-utama">Fungsi utama<a class="anchor" aria-label="anchor" href="#fungsi-utama"></a>
@@ -296,7 +348,8 @@ menjadi 8,30. Rinciannya ada di
 <code><a href="../reference/calvar_classic.html">calvar_classic()</a></code>,
 <code><a href="../reference/calvar_classic_all.html">calvar_classic_all()</a></code>
 </td>
-<td align="left">model variasi kalender klasik m1–m6</td>
+<td align="left">model variasi kalender klasik m1–m6 dengan desain
+dummy, <em>lead–lag</em>, atau jendela proporsional</td>
 </tr>
 <tr class="odd">
 <td align="left">

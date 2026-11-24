@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">lunarcast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,10 +59,27 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="lunarcast-020">lunarcast 0.2.0<a class="anchor" aria-label="anchor" href="#lunarcast-020"></a></h2>
+<div class="section level3">
+<h3 id="proportional-windows-and-lead-lag-dummies-0-2-0">Proportional windows and lead-lag dummies<a class="anchor" aria-label="anchor" href="#proportional-windows-and-lead-lag-dummies-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/calvar_classic.html">calvar_classic()</a></code> has a new argument <code>design</code> for the calendar part of the classical model: <code>"dummy"</code> (the holiday-month dummy, as before), <code>"leadlag"</code> (dummies for the period before, of and after the holiday) and <code>"window"</code> (proportional window regressors, Bell and Hillmer, 1983: the share of the days of each window that falls in a period, one effect per window). The default windows are the <code>w</code> days before the holiday, with <code>w</code> chosen by AICc from 7, 14, 21 and 28 (<code>window_grid</code>), and the holiday with the three following days.</li>
+<li>
+<code><a href="../reference/calvar_classic_all.html">calvar_classic_all()</a></code> fits the six structures for one or several designs; <code>design = c("dummy", "leadlag", "window")</code> gives 18 models. With an automatic window, the length chosen by most structures is used for all six. The results reproduce the analysis of <code>calendar_variation_model_all_v2.Rmd</code> exactly.</li>
+<li>
+<code><a href="../reference/lunarcast.html">lunarcast()</a></code> accepts several windows for one holiday, e.g. <code>window = list(adha = list(before = c(-14, -1), holiday = c(0, 3)))</code>. The holiday is split into parts with their own window regressor, effect type and level-2 rule.</li>
+<li>
+<code><a href="../reference/rolling_summary.html">rolling_summary()</a></code> also reports the mean of the yearly RMSEs (<code>mean_year</code>).</li>
+<li>Windows are printed with their signs, e.g. <code>[-14, -1] days</code>.</li>
+<li>Rolling-origin results for <code>sapi</code> (14 test years) now include the lead-lag and window designs and a lunarcast model with the two classical windows. Proportional windows improve every classical structure (m6: RMSE 7.30 instead of 7.95) but remain far from lunarcast (4.94). Splitting Eid al-Adha into the two classical windows inside lunarcast is less accurate (7.76) than the single window it chooses by AICc, so the default is unchanged.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.1" id="lunarcast-011">lunarcast 0.1.1<a class="anchor" aria-label="anchor" href="#lunarcast-011"></a></h2>
 <ul><li>The trend type now follows KPSS tests by default (<code>trend = "auto"</code>): a stochastic trend is always a candidate and a deterministic linear trend only when the tests indicate trend stationarity. This avoids extrapolating a straight line when the slope of a series has changed. <code>trend = "cv"</code> compares both trend types by cross-validation, as in 0.1.0.</li>
 <li>Every ARIMA model, including those refitted during cross-validation, must be stationary and invertible; a fit that is not is re-estimated by maximum likelihood. Fitting no longer produces “NaNs produced” or “MA part of model is not invertible” warnings.</li>
 <li>The precision-weighted level-2 rule (<code>wmean</code>) ignores occurrences without a standard error.</li>
+<li>The vignettes are published already run and rendered, as on CRAN, at <a href="https://novrisuhermi.github.io/lunarcast/vignettes/" class="uri">https://novrisuhermi.github.io/lunarcast/vignettes/</a>.</li>
 <li>Rolling-origin results for <code>sapi</code> updated: RMSE 4.94 (was 5.00); the 2025 forecast error drops from 4.40 to 1.83.</li>
 </ul></div>
     <div class="section level2">

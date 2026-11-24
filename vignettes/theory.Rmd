@@ -63,6 +63,30 @@ $\sum_{k=1}^{K}\{a_k \sin(2\pi k t/12) + b_k \cos(2\pi k t/12)\}$, or a
 seasonal ARIMA error. Crossing the two choices gives six structures, m1 to m6,
 available in `calvar_classic()` and `calvar_classic_all()`.
 
+Two other calendar designs are common in applied work and are available
+through the argument `design`:
+
+* **Lead--lag dummies** (`design = "leadlag"`): separate dummies for the
+  month before, the month of and the month after the holiday,
+  $\alpha_{-1} V_{t+1} + \alpha_0 V_t + \alpha_{+1} V_{t-1}$.
+* **Proportional windows** (`design = "window"`; Bell and Hillmer, 1983;
+  Lin and Liu, 2003): the share of the days of a window that falls in month
+  $t$. For Eid al-Adha the default uses a window for the $w$ days before the
+  holiday, when the sacrificial animals are bought, and one for the holiday
+  and the three tasyrik days:
+
+$$
+\alpha_{\text{before}}\,\mathrm{PRE}_t(w) + \alpha_{\text{holiday}}\,\mathrm{HOL}_t,
+\qquad
+\mathrm{PRE}_t(w) = \frac{\#\{\text{days of } [D - w,\, D - 1] \text{ in month } t\}}{w},
+\qquad
+\mathrm{HOL}_t = \frac{\#\{\text{days of } [D,\, D + 3] \text{ in month } t\}}{4}.
+$$
+
+The length $w$ is chosen by AICc from 7, 14, 21 and 28 days. The three designs
+crossed with the six structures give 18 models:
+`calvar_classic_all(y, dates, design = c("dummy", "leadlag", "window"))`.
+
 The holiday part makes three assumptions:
 
 1. **Timing**: the holiday affects the month that contains it, fully, and
@@ -132,6 +156,22 @@ are in July (share 0.36) and 7 in August (0.64). The window is chosen
 automatically from a grid of days before and after the holiday by AICc; for
 Eid al-Adha in `sapi` it is $(-3, +7)$, for Eid al-Fitr $(-28, +3)$, the last
 four weeks of Ramadan.
+
+**Several windows per holiday.** One window gives one effect per occurrence.
+As in the proportional window design of the classical model, a holiday can
+also be described by several windows with their own effects, for example the
+days before Eid al-Adha and the holiday itself:
+
+```{r split, eval = FALSE}
+lunarcast(sapi, list(adha = adha),
+          window = list(adha = list(before = c(-14, -1), holiday = c(0, 3))))
+```
+
+The holiday is then split into the parts `adha_before` and `adha_holiday`.
+Each part has its own window regressor, its own choice between a constant
+and a two-level effect and, if two-level, its own level-2 rule. The windows of
+a split holiday are given by the user; the automatic window search applies to
+holidays with a single window.
 
 ## 5. Multiplicative effects
 
@@ -285,7 +325,11 @@ lunarcast reduces exactly to the classical model when
 * the trend and seasonal structure are fixed.
 
 Every difference between the two models is therefore a choice that lunarcast
-makes from the data instead of assuming it.
+makes from the data instead of assuming it. In the same way, lunarcast with
+the windows of the classical window design, e.g.
+`window = list(adha = list(before = c(-14, -1), holiday = c(0, 3)))`,
+constant effects and `lambda = NULL` has the calendar regressors of
+`calvar_classic(design = "window")`.
 
 ## 11. The algorithm in one list
 
@@ -321,3 +365,7 @@ Statistical Learning* (2nd ed.). Springer.
 
 Hyndman, R. J. and Khandakar, Y. (2008). Automatic time series forecasting:
 the forecast package for R. *Journal of Statistical Software*, 27(3).
+
+Lin, J.-L. and Liu, T.-S. (2003). Modeling lunar calendar holiday effects in
+Taiwan. *Taiwan Economic Forecast and Policy*, 33(2). Earlier version: U.S.
+Census Bureau working paper, 2002.

@@ -16,7 +16,7 @@ different month than in the previous year ("moving years").'><meta property="og:
     
     <a class="navbar-brand me-2" href="../index.html">lunarcast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -119,9 +119,9 @@ forecasts for the next `h` periods.</p></dd>
 <span class="r-in"><span>  snaive <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">y</span>, <span class="va">h</span><span class="op">)</span> <span class="fu">forecast</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/forecast/man/naive.html" class="external-link">snaive</a></span><span class="op">(</span><span class="va">y</span>, h <span class="op">=</span> <span class="va">h</span><span class="op">)</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">rolling_origin</span><span class="op">(</span><span class="va">sapi</span>, <span class="va">hol</span>, <span class="va">models</span>, first <span class="op">=</span> <span class="fl">2023</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="rolling_summary.html">rolling_summary</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             all holiday other moving stable median_year</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> classic_m6 4.56    6.24  4.37   4.29   4.70        4.29</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> snaive     9.24   14.84  8.53  12.60   6.86        9.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             all holiday other moving stable mean_year median_year</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> classic_m6 4.56    6.24  4.37   4.29   4.70      4.26        4.29</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> snaive     9.24   14.84  8.53  12.60   6.86      8.25        9.00</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

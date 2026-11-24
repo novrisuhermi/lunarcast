@@ -148,6 +148,7 @@ Every automatic choice can be fixed, which also makes fitting much faster.
 | Argument | What it controls | Example |
 |:--|:--|:--|
 | `window` | days around each holiday | `window = list(adha = c(-3, 7), fitri = c(-28, 3))` |
+| `window` | several windows for one holiday, one effect each | `window = list(adha = list(before = c(-14, -1), holiday = c(0, 3)))` |
 | `effect` | constant or two-level effect | `effect = list(adha = "two-level", fitri = "constant")` |
 | `trend`, `season` | trend and seasonal structure | `trend = "stochastic", season = "none"`; `trend = "cv"` compares both trend types |
 | `select` | how the structure is chosen | `select = "aicc"` |
@@ -174,16 +175,27 @@ m6 <- calvar_classic(sapi, adha, trend = "stochastic", season = "stochastic")
 m6
 ```
 
-`calvar_classic_all()` fits all six at once, and `forecast()` works for both
-kinds of models. The two approaches are compared in
-`vignette("classic-vs-lunarcast")`.
+Besides the holiday-month dummy, the classical model has two other calendar
+designs: `design = "leadlag"` adds dummies for the months before and after
+the holiday, and `design = "window"` uses proportional windows (Bell and
+Hillmer, 1983), by default the days before the holiday, whose number is
+chosen by AICc, and the holiday with the three following days:
+
+```{r classic-window}
+calvar_classic(sapi, adha, trend = "stochastic", season = "stochastic",
+               design = "window")
+```
+
+`calvar_classic_all()` fits all six structures at once, for one or several
+designs, and `forecast()` works for both kinds of models. The approaches are
+compared in `vignette("classic-vs-lunarcast")`.
 
 ## Evaluating forecasts
 
 `rolling_origin()` refits models at the end of every year and forecasts the
 next year; `rolling_summary()` reports the RMSE overall, in holiday months, in
-years in which the holiday moved to another month, and the median of the
-yearly RMSEs.
+years in which the holiday moved to another month, and the mean and median of
+the yearly RMSEs.
 
 ```{r rolling, eval = FALSE}
 models <- list(

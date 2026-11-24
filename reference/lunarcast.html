@@ -14,7 +14,7 @@ selects the whole specification automatically."><meta property="og:image" conten
     
     <a class="navbar-brand me-2" href="../index.html">lunarcast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,7 +110,13 @@ selects the whole specification automatically.</p>
 
 
 <dt>window</dt>
-<dd><p>`"auto"` or `c(pre, post)` in days, or a named list.</p></dd>
+<dd><p>`"auto"` or `c(pre, post)` in days, or a named list with one
+entry per holiday. An entry may itself be a named list of several
+windows, e.g. `list(adha = list(before = c(-14, -1), holiday = c(0, 3)))`
+for the days before the holiday and the holiday itself; the holiday is
+then split into parts (`adha_before`, `adha_holiday`) with one
+proportional window regressor and one effect each. Settings in `effect`
+and `level2` given for `adha` apply to every part.</p></dd>
 
 
 <dt>grid</dt>
@@ -299,6 +305,37 @@ occurrence effects.</p>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># fully automatic specification (about a minute)</span></span></span>
 <span class="r-in"><span><span class="va">auto</span> <span class="op">&lt;-</span> <span class="fu">lunarcast</span><span class="op">(</span><span class="va">sapi</span>, <span class="va">hol</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># proportional windows before the holiday and for the holiday itself</span></span></span>
+<span class="r-in"><span><span class="va">split</span> <span class="op">&lt;-</span> <span class="fu">lunarcast</span><span class="op">(</span><span class="va">sapi</span>, <span class="va">hol</span><span class="op">[</span><span class="st">"adha"</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>                   window <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>adha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>before <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">14</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                             holiday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                   trend <span class="op">=</span> <span class="st">"stochastic"</span>, season <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="holiday_effects.html">holiday_effects</a></span><span class="op">(</span><span class="va">split</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         holiday      type      event       alpha         se     ratio</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   adha_before two-level 2004-02-01  0.50010639 0.17566344 1.6488967</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   adha_before two-level 2005-01-21 -0.60800821 0.16681668 0.5444342</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   adha_before two-level 2006-01-10 -0.88413368 0.29864674 0.4130719</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   adha_before two-level 2006-12-31 -0.07266680 0.14969554 0.9299106</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   adha_before two-level 2007-12-20 -0.40634868 0.15537845 0.6660779</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   adha_before two-level 2008-12-08 -0.29740627 0.27326642 0.7427422</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   adha_before two-level 2009-11-27 -0.24220148 0.15542411 0.7848980</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   adha_before two-level 2010-11-17 -0.06496085 0.15549258 0.9371041</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   adha_before two-level 2011-11-06  0.21469902 0.22365896 1.2394888</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10  adha_before two-level 2012-10-26  0.08727630 0.15646025 1.0911981</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  adha_before two-level 2013-10-15  0.34919901 0.15523162 1.4179313</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12  adha_before two-level 2014-10-05  0.41063689 0.20281758 1.5077778</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13  adha_before two-level 2015-09-24  0.39865603 0.15769074 1.4898211</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14  adha_before two-level 2016-09-12  0.64663249 0.19582539 1.9091011</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15  adha_before two-level 2017-09-01  0.21428292 0.14835645 1.2389731</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16  adha_before two-level 2018-08-22  0.48625906 0.15547260 1.6262212</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17  adha_before two-level 2019-08-11  0.60226145 0.21120536 1.8262441</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18  adha_before two-level 2020-07-31  0.18740723 0.14862530 1.2061184</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19  adha_before two-level 2021-07-20  0.42599930 0.15758270 1.5311197</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20  adha_before two-level 2022-07-10  0.56049955 0.21792858 1.7515473</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21  adha_before two-level 2023-06-29  0.33797086 0.14849408 1.4020996</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22  adha_before two-level 2024-06-17  0.28376311 0.15519995 1.3281183</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23  adha_before two-level 2025-06-06  0.38905543 0.21611845 1.4755863</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 adha_holiday  constant       &lt;NA&gt;  0.61457167 0.05612237 1.8488645</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
