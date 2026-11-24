@@ -15,5 +15,6 @@ test_that("rolling_origin flags holiday months and moving years", {
   expect_equal(unique(r$moving[r$year == 2023]), TRUE)
   expect_equal(unique(r$moving[r$year == 2024]), FALSE)
   s <- rolling_summary(r)
-  expect_equal(colnames(s), c("all", "holiday", "other", "moving", "stable", "median_year"))
+  expect_equal(colnames(s), c("all", "holiday", "other", "moving", "stable",
+                             "mean_year", "median_year"))
 })

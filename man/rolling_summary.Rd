@@ -12,8 +12,8 @@ rolling_summary(r)
 }
 \value{
 A matrix of RMSEs per model: all periods, holiday months, other
-  months, moving years, other (stable) years and the median of the yearly
-  RMSEs.
+  months, moving years, other (stable) years, and the mean and the median
+  of the yearly RMSEs.
 }
 \description{
 Summarise a rolling-origin evaluation

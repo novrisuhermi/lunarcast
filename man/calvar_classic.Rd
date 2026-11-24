@@ -11,6 +11,9 @@ calvar_classic(
   season = c("dummy", "fourier", "stochastic"),
   K = frequency(y)/2 - 1,
   lambda = NULL,
+  design = c("dummy", "leadlag", "window"),
+  window = list(before = "auto", holiday = c(0, 3)),
+  window_grid = c(7, 14, 21, 28),
   ...
 )
 }
@@ -29,19 +32,47 @@ monthly data).}
 \item{lambda}{Box-Cox parameter; `NULL` (default) keeps the original scale,
 so the holiday effect is additive.}
 
+\item{design}{Calendar design: `"dummy"` (default), `"leadlag"` or
+`"window"`.}
+
+\item{window}{For `design = "window"`: a named list of windows `c(a, b)` in
+days relative to the holiday, one regressor (and one effect) per window.
+The default, `list(before = "auto", holiday = c(0, 3))`, chooses the
+length of the window before the holiday by AICc.}
+
+\item{window_grid}{Candidate lengths \eqn{w} (days) for a window given as
+`"auto"`, which then covers the \eqn{w} days before the holiday.}
+
 \item{...}{Passed to [forecast::auto.arima()].}
 }
 \value{
 An object of class `"calvar_classic"`.
 }
 \description{
-Regression with ARIMA errors in which a moving holiday enters as a dummy
-for the period that contains it and has the same effect in every year:
-\deqn{Y_t = \beta_0 + \beta_1 t + S_t + \alpha V_t + N_t,}
-where \eqn{V_t = 1} if period \eqn{t} contains the holiday, \eqn{S_t} is
-the seasonal component and \eqn{N_t} an ARIMA process. This is the
-calendar variation model commonly used in applied work and the benchmark
-for [lunarcast()], which contains it as a special case.
+Regression with ARIMA errors in which a moving holiday has the same effect
+in every year:
+\deqn{Y_t = \beta_0 + \beta_1 t + S_t + C_t + N_t,}
+where \eqn{S_t} is the seasonal component, \eqn{N_t} an ARIMA process and
+\eqn{C_t} the calendar component given by `design`:
+\describe{
+  \item{`"dummy"` (D1)}{\eqn{C_t = \alpha V_t}, with \eqn{V_t = 1} if period
+    \eqn{t} contains the holiday. This is the calendar variation model
+    commonly used in applied work.}
+  \item{`"leadlag"` (D2)}{\eqn{C_t = \alpha_{-1} V_{t+1} + \alpha_0 V_t +
+    \alpha_{+1} V_{t-1}}: separate dummies for the period before, the period
+    of and the period after the holiday.}
+  \item{`"window"` (D3)}{proportional window regressors (Bell and Hillmer,
+    1983): for every window \eqn{[D + a, D + b]} in `window`, the share of
+    its days that falls in period \eqn{t}, e.g.
+    \eqn{C_t = \alpha_{\mathrm{before}}\,\mathrm{PRE}_t(w) +
+    \alpha_{\mathrm{holiday}}\,\mathrm{HOL}_t}, where \eqn{\mathrm{PRE}_t(w)}
+    is the share of the \eqn{w} days before the holiday and
+    \eqn{\mathrm{HOL}_t} the share of the holiday window (by default the
+    holiday and the three following days, the tasyrik days of Eid
+    al-Adha).}
+}
+[lunarcast()] generalises the window design: its window is chosen
+automatically and its effect may change from one occurrence to the next.
 }
 \details{
 The six structures of the classical approach combine a trend and
@@ -60,12 +91,25 @@ a seasonal component:
 orders, including the order of differencing, are chosen by
 [forecast::auto.arima()]. Seasonal dummies use the last season (December)
 as reference.
+
+With `design = "window"`, a window given as `"auto"` (by default the
+`before` window) is chosen by AICc among \eqn{[D - w, D - 1]} for \eqn{w}
+in `window_grid`, with all other choices fixed.
 }
 \examples{
-m1 <- calvar_classic(sapi, holiday_dates("idul_adha"),
-                     trend = "deterministic", season = "dummy")
+hol <- holiday_dates("idul_adha")
+m1 <- calvar_classic(sapi, hol, trend = "deterministic", season = "dummy")
 m1
 forecast(m1, h = 12)
+# lead-lag dummies and proportional windows (14 days before, holiday + 3)
+calvar_classic(sapi, hol, "stochastic", "dummy", design = "leadlag")
+calvar_classic(sapi, hol, "stochastic", "dummy", design = "window",
+               window = list(before = c(-14, -1), holiday = c(0, 3)))
+}
+\references{
+Bell, W. R. and Hillmer, S. C. (1983). Modeling time series
+  with calendar variation. *Journal of the American Statistical
+  Association*, 78, 526-534.
 }
 \seealso{
 [calvar_classic_all()] for the six structures at once and

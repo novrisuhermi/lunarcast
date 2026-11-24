@@ -1,3 +1,35 @@
+# lunarcast 0.2.0
+
+## Proportional windows and lead-lag dummies
+
+* `calvar_classic()` has a new argument `design` for the calendar part of the
+  classical model: `"dummy"` (the holiday-month dummy, as before),
+  `"leadlag"` (dummies for the period before, of and after the holiday) and
+  `"window"` (proportional window regressors, Bell and Hillmer, 1983: the
+  share of the days of each window that falls in a period, one effect per
+  window). The default windows are the `w` days before the holiday, with `w`
+  chosen by AICc from 7, 14, 21 and 28 (`window_grid`), and the holiday with
+  the three following days.
+* `calvar_classic_all()` fits the six structures for one or several designs;
+  `design = c("dummy", "leadlag", "window")` gives 18 models. With an
+  automatic window, the length chosen by most structures is used for all six.
+  The results reproduce the analysis of `calendar_variation_model_all_v2.Rmd`
+  exactly.
+* `lunarcast()` accepts several windows for one holiday, e.g.
+  `window = list(adha = list(before = c(-14, -1), holiday = c(0, 3)))`. The
+  holiday is split into parts with their own window regressor, effect type
+  and level-2 rule.
+* `rolling_summary()` also reports the mean of the yearly RMSEs
+  (`mean_year`).
+* Windows are printed with their signs, e.g. `[-14, -1] days`.
+* Rolling-origin results for `sapi` (14 test years) now include the
+  lead-lag and window designs and a lunarcast model with the two classical
+  windows. Proportional windows improve every classical structure (m6: RMSE
+  7.30 instead of 7.95) but remain far from lunarcast (4.94). Splitting Eid
+  al-Adha into the two classical windows inside lunarcast is less accurate
+  (7.76) than the single window it chooses by AICc, so the default is
+  unchanged.
+
 # lunarcast 0.1.1
 
 * The trend type now follows KPSS tests by default (`trend = "auto"`): a

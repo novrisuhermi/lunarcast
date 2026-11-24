@@ -23,7 +23,8 @@ every year. lunarcast relaxes each of its assumptions:
 - **Window regressors.** A holiday affects the days around it, so the
   effect is spread over the months in proportion to the days of a window
   around the holiday that fall in each month. The window is selected
-  from the data.
+  from the data, and a holiday can also have several windows with their
+  own effects, such as the days before it and the holiday itself.
 - **Two-level effects.** Every occurrence of a holiday gets its own
   effect (level 1), and the effect of the next occurrence is forecast
   from the sequence of past effects (level 2), with its uncertainty.
@@ -35,7 +36,9 @@ every year. lunarcast relaxes each of its assumptions:
   one-standard-error rule.
 
 The classical model is included too (`calvar_classic()`), as a benchmark
-and as a special case of lunarcast.
+and as a special case of lunarcast, with three calendar designs: a
+holiday-month dummy, lead–lag dummies for the months before and after,
+and proportional windows (Bell and Hillmer, 1983).
 
 ## Installation
 
@@ -158,8 +161,11 @@ seasonality):
 ``` r
 calvar_classic(sapi, hol$adha, trend = "stochastic", season = "stochastic")
 #> Classical calendar variation model: stochastic trend + stochastic seasonality 
+#> Calendar design: holiday dummy 
 #> Regression with ARIMA(1,1,1)(1,0,2)[12] errors | AICc = 1708.9 
-#> Holiday effect (same every year): 18.92 (s.e. 2.01), original scale
+#> Holiday effects (same every year, original scale):
+#>     term estimate   se
+#>  holiday    18.92 2.01
 ```
 
 ## How it works
@@ -196,45 +202,50 @@ calendar effects, is in `vignette("theory")`.
 Fourteen test years (2012 to 2025) of rolling-origin forecasts of `sapi`
 (see `vignette("classic-vs-lunarcast")`):
 
-| Model                                                           |     RMSE | RMSE in holiday months |
-|:----------------------------------------------------------------|---------:|-----------------------:|
-| Classical m1 (deterministic trend, dummies)                     |    10.42 |                  27.12 |
-| Classical m6 (stochastic trend and seasonality), best classical |     7.95 |                  20.25 |
-| lunarcast, structure chosen by AICc                             |     5.73 |                  12.28 |
-| **lunarcast (default)**                                         | **4.94** |               **8.30** |
+| Model                                                        |     RMSE | RMSE in holiday months |
+|:-------------------------------------------------------------|---------:|-----------------------:|
+| Classical m1 (deterministic trend, dummies), month dummy     |    10.42 |                  27.12 |
+| Classical m6 (stochastic trend and seasonality), month dummy |     7.95 |                  20.25 |
+| Classical m6, proportional windows, best classical           |     7.30 |                  19.66 |
+| lunarcast, structure chosen by AICc                          |     5.73 |                  12.28 |
+| **lunarcast (default)**                                      | **4.94** |               **8.30** |
 
 These results come from a single series; they show what the method can
 do, not a general ranking.
 
 ## Functions
 
-| Function                                   | Purpose                                                |
-|:-------------------------------------------|:-------------------------------------------------------|
-| `lunarcast()`                              | automatic two-level calendar variation model           |
-| `forecast()`                               | forecasts and scenarios for every model in the package |
-| `holiday_effects()`                        | effect of every holiday occurrence                     |
-| `calvar_classic()`, `calvar_classic_all()` | classical model, structures m1 to m6                   |
-| `holiday_dates()`, `easter_dates()`        | Indonesian holiday dates, Easter-based holidays        |
-| `holiday_window()`                         | window regressors from any vector of dates             |
-| `rolling_origin()`, `rolling_summary()`    | calendar-aware rolling-origin evaluation               |
-| `forecast_accuracy()`                      | RMSE, MAE, MAPE and sMAPE                              |
+| Function                                   | Purpose                                                                                     |
+|:-------------------------------------------|:--------------------------------------------------------------------------------------------|
+| `lunarcast()`                              | automatic two-level calendar variation model                                                |
+| `forecast()`                               | forecasts and scenarios for every model in the package                                      |
+| `holiday_effects()`                        | effect of every holiday occurrence                                                          |
+| `calvar_classic()`, `calvar_classic_all()` | classical model: structures m1 to m6, month dummy, lead–lag dummies or proportional windows |
+| `holiday_dates()`, `easter_dates()`        | Indonesian holiday dates, Easter-based holidays                                             |
+| `holiday_window()`                         | window regressors from any vector of dates                                                  |
+| `rolling_origin()`, `rolling_summary()`    | calendar-aware rolling-origin evaluation                                                    |
+| `forecast_accuracy()`                      | RMSE, MAE, MAPE and sMAPE                                                                   |
 
 ## Learn more
 
 The vignettes are available already run and rendered, as on CRAN, at
 <https://novrisuhermi.github.io/lunarcast/vignettes/>:
 
-- [Get started with lunarcast](https://novrisuhermi.github.io/lunarcast/vignettes/lunarcast.html): a complete
-  analysis step by step.
-- [How lunarcast works](https://novrisuhermi.github.io/lunarcast/vignettes/theory.html): the theory, with
-  equations.
-- [From the classical model to lunarcast](https://novrisuhermi.github.io/lunarcast/vignettes/classic-vs-lunarcast.html):
+- [Get started with
+  lunarcast](https://novrisuhermi.github.io/lunarcast/vignettes/lunarcast.html):
+  a complete analysis step by step.
+- [How lunarcast
+  works](https://novrisuhermi.github.io/lunarcast/vignettes/theory.html):
+  the theory, with equations.
+- [From the classical model to
+  lunarcast](https://novrisuhermi.github.io/lunarcast/vignettes/classic-vs-lunarcast.html):
   the classical models m1 to m6 and the evaluation.
-- [Panduan lunarcast (Bahasa Indonesia)](https://novrisuhermi.github.io/lunarcast/vignettes/panduan-indonesia.html):
+- [Panduan lunarcast (Bahasa
+  Indonesia)](https://novrisuhermi.github.io/lunarcast/vignettes/panduan-indonesia.html):
   panduan dalam Bahasa Indonesia.
 
-The package website, <https://novrisuhermi.github.io/lunarcast/>, has the
-same articles and the reference of every function.
+The package website, <https://novrisuhermi.github.io/lunarcast/>, has
+the same articles and the reference of every function.
 
 ## Ringkasan (Bahasa Indonesia)
 
@@ -256,7 +267,7 @@ berbahasa Indonesia: `vignette("panduan-indonesia")`.
 ## Citation
 
     Suhermi N (2026). _lunarcast: Calendar Variation Models for Time Series
-    with Moving Holidays_. R package version 0.1.1,
+    with Moving Holidays_. R package version 0.2.0,
     <https://github.com/novrisuhermi/lunarcast>.
 
 ## Code of Conduct

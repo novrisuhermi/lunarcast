@@ -4,7 +4,16 @@
 \alias{calvar_classic_all}
 \title{The six classical calendar variation models}
 \usage{
-calvar_classic_all(y, dates, K = frequency(y)/2 - 1, lambda = NULL, ...)
+calvar_classic_all(
+  y,
+  dates,
+  K = frequency(y)/2 - 1,
+  lambda = NULL,
+  design = "dummy",
+  window = list(before = "auto", holiday = c(0, 3)),
+  window_grid = c(7, 14, 21, 28),
+  ...
+)
 }
 \arguments{
 \item{y}{Monthly or quarterly `ts`.}
@@ -17,16 +26,34 @@ monthly data).}
 \item{lambda}{Box-Cox parameter; `NULL` (default) keeps the original scale,
 so the holiday effect is additive.}
 
+\item{design}{One or more of `"dummy"`, `"leadlag"` and `"window"`. With
+several designs the models are named `m1_dummy`, `m1_leadlag`, ...}
+
+\item{window}{For `design = "window"`: a named list of windows `c(a, b)` in
+days relative to the holiday, one regressor (and one effect) per window.
+The default, `list(before = "auto", holiday = c(0, 3))`, chooses the
+length of the window before the holiday by AICc.}
+
+\item{window_grid}{Candidate lengths \eqn{w} (days) for a window given as
+`"auto"`, which then covers the \eqn{w} days before the holiday.}
+
 \item{...}{Passed to [forecast::auto.arima()].}
 }
 \value{
 An object of class `"calvar_classic_set"`: a list with the fitted
-  models (`models`, named `m1` to `m6`) and their specification (`spec`).
+  models (`models`), their specification (`spec`) and, for an automatic
+  window, the AICc of every structure and candidate (`window_aicc`).
 }
 \description{
 Fits the six combinations of trend (deterministic or stochastic) and
 seasonality (dummy, Fourier or stochastic) of [calvar_classic()], named
-`m1` to `m6` as in its table.
+`m1` to `m6` as in its table, for one or several calendar designs.
+}
+\details{
+With `design = "window"` and a window given as `"auto"`, every
+  structure ranks the candidate windows by AICc, and the window chosen by
+  most structures (the shorter one in a tie) is used for all six, so that
+  their calendar regressors are the same.
 }
 \examples{
 \donttest{
@@ -34,5 +61,8 @@ set <- calvar_classic_all(sapi, holiday_dates("idul_adha"))
 set
 fc <- forecast(set, h = 12)
 names(fc)
+# the 18 models of the three calendar designs
+all18 <- calvar_classic_all(sapi, holiday_dates("idul_adha"),
+                            design = c("dummy", "leadlag", "window"))
 }
 }

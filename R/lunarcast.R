@@ -36,7 +36,13 @@
 #' @param holidays Named list of `Date` vectors, e.g.
 #'   `list(adha = holiday_dates("idul_adha"))`.
 #' @param effect `"auto"`, `"constant"` or `"two-level"`, or a named list.
-#' @param window `"auto"` or `c(pre, post)` in days, or a named list.
+#' @param window `"auto"` or `c(pre, post)` in days, or a named list with one
+#'   entry per holiday. An entry may itself be a named list of several
+#'   windows, e.g. `list(adha = list(before = c(-14, -1), holiday = c(0, 3)))`
+#'   for the days before the holiday and the holiday itself; the holiday is
+#'   then split into parts (`adha_before`, `adha_holiday`) with one
+#'   proportional window regressor and one effect each. Settings in `effect`
+#'   and `level2` given for `adha` apply to every part.
 #' @param grid List with candidate `pre` and `post` offsets (days, >= 0).
 #' @param level2 `"auto"`, `"mean"`, `"wmean"` (precision-weighted mean),
 #'   `"rw"`, `"ses"`, `"holt"` (damped) or a fixed log effect, or a named list.
@@ -88,6 +94,12 @@
 #' \donttest{
 #' # fully automatic specification (about a minute)
 #' auto <- lunarcast(sapi, hol)
+#' # proportional windows before the holiday and for the holiday itself
+#' split <- lunarcast(sapi, hol["adha"],
+#'                    window = list(adha = list(before = c(-14, -1),
+#'                                              holiday = c(0, 3))),
+#'                    trend = "stochastic", season = "none")
+#' holiday_effects(split)
 #' }
 #' @export
 lunarcast <- function(y, holidays, effect = "auto", window = "auto",
@@ -107,9 +119,12 @@ lunarcast <- function(y, holidays, effect = "auto", window = "auto",
   cv_rule <- match.arg(cv_rule)
   if (!frequency(y) %in% c(4, 12)) stop("`y` must be a monthly or quarterly ts.")
   if (inherits(holidays, "Date")) holidays <- list(holiday = holidays)
-  hn <- names(holidays)
-  if (is.null(hn) || any(hn == ""))
+  if (is.null(names(holidays)) || any(names(holidays) == ""))
     stop("`holidays` must be a named list of Date vectors.")
+  sp <- .split_windows(holidays, window, effect, level2)
+  holidays <- sp$holidays; window <- sp$window
+  effect <- sp$effect; level2 <- sp$level2
+  hn <- names(holidays)
   if (!.is_log(lambda)) share <- "linear"
   n <- length(y)
   z <- .trans(y, lambda)
@@ -288,8 +303,7 @@ print.lunarcast <- function(x, ...) {
   for (nm in names(x$holidays)) {
     w <- x$window[[nm]]
     e <- x$effects[[nm]]
-    cat("\n", nm, ": ", x$effect[[nm]], " effect, window [", w[1], ", +", w[2],
-        "] days", sep = "")
+    cat("\n", nm, ": ", x$effect[[nm]], " effect, window ", .fmt_win(w), sep = "")
     if (x$effect[[nm]] == "two-level") {
       l <- x$level2[[nm]]
       cat(", level 2 = ", l$method,

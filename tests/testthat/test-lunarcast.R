@@ -26,3 +26,19 @@ test_that("select = 'aicc' with a fixed structure runs", {
   expect_equal(fit$structure$season, "none")
   expect_length(forecast(fit, h = 6)$mean, 6)
 })
+
+test_that("a holiday can have several proportional windows", {
+  skip_on_cran()
+  hol <- list(adha = holiday_dates("idul_adha"))
+  fit <- lunarcast(sapi, hol,
+                   window = list(adha = list(before = c(-14, -1), holiday = c(0, 3))),
+                   effect = "constant", trend = "stochastic", season = "none")
+  expect_equal(names(fit$holidays), c("adha_before", "adha_holiday"))
+  expect_equal(fit$window$adha_before, c(-14, -1))
+  expect_equal(nrow(holiday_effects(fit)), 2)
+  fc <- forecast(fit, h = 12)
+  expect_length(fc$mean, 12)
+  expect_gt(fc$mean[6], fc$mean[3])     # May 2026 contains Eid al-Adha
+  expect_error(lunarcast(sapi, hol, window = list(adha = list(c(-14, -1)))),
+               "must be named")
+})

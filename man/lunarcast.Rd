@@ -34,7 +34,13 @@ lunarcast(
 
 \item{effect}{`"auto"`, `"constant"` or `"two-level"`, or a named list.}
 
-\item{window}{`"auto"` or `c(pre, post)` in days, or a named list.}
+\item{window}{`"auto"` or `c(pre, post)` in days, or a named list with one
+entry per holiday. An entry may itself be a named list of several
+windows, e.g. `list(adha = list(before = c(-14, -1), holiday = c(0, 3)))`
+for the days before the holiday and the holiday itself; the holiday is
+then split into parts (`adha_before`, `adha_holiday`) with one
+proportional window regressor and one effect each. Settings in `effect`
+and `level2` given for `adha` apply to every part.}
 
 \item{grid}{List with candidate `pre` and `post` offsets (days, >= 0).}
 
@@ -139,6 +145,12 @@ forecast(fit, h = 12)
 \donttest{
 # fully automatic specification (about a minute)
 auto <- lunarcast(sapi, hol)
+# proportional windows before the holiday and for the holiday itself
+split <- lunarcast(sapi, hol["adha"],
+                   window = list(adha = list(before = c(-14, -1),
+                                             holiday = c(0, 3))),
+                   trend = "stochastic", season = "none")
+holiday_effects(split)
 }
 }
 \seealso{

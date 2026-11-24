@@ -34,7 +34,9 @@ lunarcast relaxes each of its assumptions:
 
 * **Window regressors.** A holiday affects the days around it, so the effect is
   spread over the months in proportion to the days of a window around the
-  holiday that fall in each month. The window is selected from the data.
+  holiday that fall in each month. The window is selected from the data, and
+  a holiday can also have several windows with their own effects, such as
+  the days before it and the holiday itself.
 * **Two-level effects.** Every occurrence of a holiday gets its own effect
   (level 1), and the effect of the next occurrence is forecast from the
   sequence of past effects (level 2), with its uncertainty.
@@ -45,7 +47,9 @@ lunarcast relaxes each of its assumptions:
   cross-validated forecasts with a one-standard-error rule.
 
 The classical model is included too (`calvar_classic()`), as a benchmark and
-as a special case of lunarcast.
+as a special case of lunarcast, with three calendar designs: a holiday-month
+dummy, lead--lag dummies for the months before and after, and proportional
+windows (Bell and Hillmer, 1983).
 
 ## Installation
 
@@ -144,8 +148,9 @@ Fourteen test years (2012 to 2025) of rolling-origin forecasts of `sapi`
 
 | Model | RMSE | RMSE in holiday months |
 |:--|--:|--:|
-| Classical m1 (deterministic trend, dummies) | 10.42 | 27.12 |
-| Classical m6 (stochastic trend and seasonality), best classical | 7.95 | 20.25 |
+| Classical m1 (deterministic trend, dummies), month dummy | 10.42 | 27.12 |
+| Classical m6 (stochastic trend and seasonality), month dummy | 7.95 | 20.25 |
+| Classical m6, proportional windows, best classical | 7.30 | 19.66 |
 | lunarcast, structure chosen by AICc | 5.73 | 12.28 |
 | **lunarcast (default)** | **4.94** | **8.30** |
 
@@ -159,7 +164,7 @@ not a general ranking.
 | `lunarcast()` | automatic two-level calendar variation model |
 | `forecast()` | forecasts and scenarios for every model in the package |
 | `holiday_effects()` | effect of every holiday occurrence |
-| `calvar_classic()`, `calvar_classic_all()` | classical model, structures m1 to m6 |
+| `calvar_classic()`, `calvar_classic_all()` | classical model: structures m1 to m6, month dummy, lead--lag dummies or proportional windows |
 | `holiday_dates()`, `easter_dates()` | Indonesian holiday dates, Easter-based holidays |
 | `holiday_window()` | window regressors from any vector of dates |
 | `rolling_origin()`, `rolling_summary()` | calendar-aware rolling-origin evaluation |

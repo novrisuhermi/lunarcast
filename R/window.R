@@ -56,3 +56,41 @@ holiday_window <- function(dates, window = c(0, 0), y, h = 0, per_event = FALSE)
   list(X = do.call(cbind, blocks),
        cols = setNames(lapply(blocks, colnames), names(holidays)))
 }
+
+# Several windows for one holiday, e.g.
+#   window = list(adha = list(before = c(-14, -1), holiday = c(0, 3)))
+# split the holiday into parts ("adha_before", "adha_holiday") with the same
+# dates, one window each; per-holiday settings in `effect` and `level2` given
+# for "adha" apply to every part unless a part is named explicitly.
+.split_windows <- function(holidays, window, effect, level2) {
+  if (!is.list(window)) return(list(holidays = holidays, window = window,
+                                    effect = effect, level2 = level2))
+  multi <- names(window)[vapply(window, function(w) is.list(w), logical(1))]
+  multi <- intersect(multi, names(holidays))
+  if (!length(multi)) return(list(holidays = holidays, window = window,
+                                  effect = effect, level2 = level2))
+  spread <- function(x, nm, parts) {
+    if (!is.list(x) || is.null(x[[nm]])) return(x)
+    for (p in parts) if (is.null(x[[p]])) x[[p]] <- x[[nm]]
+    x[[nm]] <- NULL
+    x
+  }
+  h2 <- list(); w2 <- window[setdiff(names(window), multi)]
+  for (nm in names(holidays)) {
+    if (!nm %in% multi) { h2[[nm]] <- holidays[[nm]]; next }
+    wl <- window[[nm]]
+    if (is.null(names(wl)) || any(names(wl) == ""))
+      stop("Several windows for one holiday must be named, e.g. list(before = c(-14, -1), holiday = c(0, 3)).")
+    parts <- paste0(nm, "_", names(wl))
+    for (i in seq_along(wl)) {
+      w <- wl[[i]]
+      if (!(is.numeric(w) && length(w) == 2 && w[1] <= w[2]))
+        stop("Each window of a split holiday must be c(a, b) with a <= b (days).")
+      h2[[parts[i]]] <- holidays[[nm]]
+      w2[[parts[i]]] <- w
+    }
+    effect <- spread(effect, nm, parts)
+    level2 <- spread(level2, nm, parts)
+  }
+  list(holidays = h2, window = w2, effect = effect, level2 = level2)
+}

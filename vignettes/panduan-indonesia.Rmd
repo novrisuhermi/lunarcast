@@ -42,6 +42,24 @@ lipat sekitar 2015--2019, dan sisa efek yang tidak tertangkap dummy bocor ke
 komponen musiman sehingga muncul "puncak hantu" di bulan lama setelah hari
 raya pindah bulan.
 
+Selain dummy bulan hari raya, model klasik di lunarcast punya dua desain
+kalender lain melalui argumen `design`:
+
+* **Dummy *lead--lag*** (`design = "leadlag"`): dummy terpisah untuk bulan
+  sebelum, bulan, dan bulan sesudah hari raya.
+* **Jendela proporsional** (`design = "window"`; Bell dan Hillmer, 1983):
+  porsi hari dari sebuah jendela yang jatuh di bulan $t$. Bawaannya memakai
+  jendela $w$ hari sebelum Idul Adha (masa membeli hewan kurban), dengan $w$
+  dipilih dengan AICc dari 7, 14, 21, dan 28 hari, serta jendela Idul Adha dan
+  tiga hari tasyrik:
+
+$$
+\alpha_{\text{sebelum}}\,\mathrm{PRE}_t(w) + \alpha_{\text{hari raya}}\,\mathrm{HOL}_t .
+$$
+
+Jendela proporsional memperbaiki asumsi pertama (waktu), tetapi efeknya tetap
+sama setiap tahun.
+
 ## Yang dilakukan lunarcast
 
 1. **Regresor jendela.** Dummy diganti dengan porsi hari dalam jendela
@@ -126,11 +144,35 @@ m6 <- calvar_classic(sapi, hol$adha, trend = "stochastic", season = "stochastic"
 m6
 ```
 
-Keenam model klasik (m1 sampai m6) dapat diestimasi sekaligus dengan
-`calvar_classic_all()`. Pada evaluasi *rolling origin* 14 tahun (2012--2025),
-model klasik terbaik (m6) memiliki RMSE 7,95, sedangkan lunarcast 4,94; di
-bulan hari raya, RMSE turun dari 20,25 menjadi 8,30. Rinciannya ada di
-`vignette("classic-vs-lunarcast")`.
+Model yang sama dengan jendela proporsional (panjang jendela sebelum hari
+raya dipilih otomatis):
+
+```{r}
+m6w <- calvar_classic(sapi, hol$adha, trend = "stochastic", season = "stochastic",
+                      design = "window")
+m6w
+```
+
+Enam struktur dikali tiga desain menghasilkan 18 model, yang dapat diestimasi
+sekaligus dengan
+`calvar_classic_all(sapi, hol$adha, design = c("dummy", "leadlag", "window"))`.
+
+Di `lunarcast()` sendiri, satu hari raya juga dapat diberi beberapa jendela
+proporsional dengan efek masing-masing, misalnya 14 hari sebelum Idul Adha dan
+hari raya beserta hari tasyrik:
+
+```{r, eval = FALSE}
+lunarcast(sapi, hol["adha"],
+          window = list(adha = list(before = c(-14, -1), holiday = c(0, 3))))
+```
+
+Pada evaluasi *rolling origin* 14 tahun (2012--2025), jendela proporsional
+memperbaiki semua struktur klasik: RMSE m6 turun dari 7,95 (dummy bulan)
+menjadi 7,30. Namun di bulan hari raya RMSE-nya hanya turun dari 20,25 menjadi
+19,66, karena efeknya tetap sama setiap tahun. lunarcast mencapai RMSE 4,94,
+dan 8,30 di bulan hari raya. Memecah Idul Adha menjadi dua jendela klasik di
+dalam lunarcast justru kurang akurat (7,76) dibanding satu jendela yang
+dipilihnya dengan AICc. Rinciannya ada di `vignette("classic-vs-lunarcast")`.
 
 ## Fungsi utama
 
@@ -139,7 +181,7 @@ bulan hari raya, RMSE turun dari 20,25 menjadi 8,30. Rinciannya ada di
 | `lunarcast()` | model variasi kalender dua level otomatis |
 | `forecast()` | ramalan dan skenario |
 | `holiday_effects()` | tabel efek per kejadian |
-| `calvar_classic()`, `calvar_classic_all()` | model variasi kalender klasik m1--m6 |
+| `calvar_classic()`, `calvar_classic_all()` | model variasi kalender klasik m1--m6 dengan desain dummy, *lead--lag*, atau jendela proporsional |
 | `holiday_dates()`, `easter_dates()` | tanggal hari raya |
 | `holiday_window()` | regresor jendela |
 | `rolling_origin()`, `rolling_summary()` | evaluasi *rolling origin* |

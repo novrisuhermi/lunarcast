@@ -56,21 +56,22 @@ rolling_origin <- function(y, dates, models, first = start(y)[1] + 8) {
 #' @param r Output of [rolling_origin()] (columns `year`, `model`, `actual`,
 #'   `pred`, `holiday`, `moving`).
 #' @return A matrix of RMSEs per model: all periods, holiday months, other
-#'   months, moving years, other (stable) years and the median of the yearly
-#'   RMSEs.
+#'   months, moving years, other (stable) years, and the mean and the median
+#'   of the yearly RMSEs.
 #' @export
 rolling_summary <- function(r) {
   if (!is.factor(r$model)) r$model <- factor(r$model, levels = unique(r$model))
   rmse <- function(i) tapply((r$pred - r$actual)[i], r$model[i],
                              function(e) sqrt(mean(e^2, na.rm = TRUE)))
-  med <- vapply(levels(r$model), function(m) {
+  yearly <- lapply(levels(r$model), function(m) {
     s <- r[r$model == m, ]
-    median(tapply((s$pred - s$actual)^2, s$year,
-                  function(v) sqrt(mean(v, na.rm = TRUE))))
-  }, numeric(1))
+    tapply((s$pred - s$actual)^2, s$year, function(v) sqrt(mean(v, na.rm = TRUE)))
+  })
   round(cbind(all = rmse(TRUE), holiday = rmse(r$holiday),
               other = rmse(!r$holiday), moving = rmse(r$moving),
-              stable = rmse(!r$moving), median_year = med), 2)
+              stable = rmse(!r$moving),
+              mean_year = vapply(yearly, mean, numeric(1)),
+              median_year = vapply(yearly, median, numeric(1))), 2)
 }
 
 #' Forecast accuracy measures
